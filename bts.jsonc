@@ -13,7 +13,8 @@
     "tanstack-start"
   ],
   "addons": [
-    "turborepo"
+    "turborepo",
+    "ultracite"
   ],
   "examples": [
     "todo"
