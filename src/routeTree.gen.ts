@@ -9,81 +9,193 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as ScanIndexRouteImport } from './routes/scan/index'
+import { Route as OrderIndexRouteImport } from './routes/order/index'
+import { Route as OrderHistoryIndexRouteImport } from './routes/order-history/index'
+import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
+import { Route as LayoutCollectionNameRouteImport } from './routes/_layout.$collectionName'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
-import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as LayoutProductsCategoryIndexRouteImport } from './routes/_layout.products.$category.index'
+import { Route as LayoutProductsCategorySubcategoryIndexRouteImport } from './routes/_layout.products.$category.$subcategory.index'
+import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './routes/_layout.products.$category.$subcategory.$product'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LayoutRoute = LayoutRouteImport.update({
+  id: '/_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSplatRoute = ApiSplatRouteImport.update({
-  id: '/api/$',
-  path: '/api/$',
+const ScanIndexRoute = ScanIndexRouteImport.update({
+  id: '/scan/',
+  path: '/scan/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OrderIndexRoute = OrderIndexRouteImport.update({
+  id: '/order/',
+  path: '/order/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderHistoryIndexRoute = OrderHistoryIndexRouteImport.update({
+  id: '/order-history/',
+  path: '/order-history/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutIndexRoute = LayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutCollectionNameRoute = LayoutCollectionNameRouteImport.update({
+  id: '/$collectionName',
+  path: '/$collectionName',
+  getParentRoute: () => LayoutRoute,
 } as any)
 const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   id: '/demo/api/names',
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
-  id: '/api/rpc/$',
-  path: '/api/rpc/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const LayoutProductsCategoryIndexRoute =
+  LayoutProductsCategoryIndexRouteImport.update({
+    id: '/products/$category/',
+    path: '/products/$category/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutProductsCategorySubcategoryIndexRoute =
+  LayoutProductsCategorySubcategoryIndexRouteImport.update({
+    id: '/products/$category/$subcategory/',
+    path: '/products/$category/$subcategory/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutProductsCategorySubcategoryProductRoute =
+  LayoutProductsCategorySubcategoryProductRouteImport.update({
+    id: '/products/$category/$subcategory/$product',
+    path: '/products/$category/$subcategory/$product',
+    getParentRoute: () => LayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/api/$': typeof ApiSplatRoute
-  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/$collectionName': typeof LayoutCollectionNameRoute
+  '/': typeof LayoutIndexRoute
+  '/order-history': typeof OrderHistoryIndexRoute
+  '/order': typeof OrderIndexRoute
+  '/scan': typeof ScanIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
+  '/products/$category': typeof LayoutProductsCategoryIndexRoute
+  '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
+  '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/api/$': typeof ApiSplatRoute
-  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/$collectionName': typeof LayoutCollectionNameRoute
+  '/': typeof LayoutIndexRoute
+  '/order-history': typeof OrderHistoryIndexRoute
+  '/order': typeof OrderIndexRoute
+  '/scan': typeof ScanIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
+  '/products/$category': typeof LayoutProductsCategoryIndexRoute
+  '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
+  '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/api/$': typeof ApiSplatRoute
-  '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/$collectionName': typeof LayoutCollectionNameRoute
+  '/_layout/': typeof LayoutIndexRoute
+  '/order-history/': typeof OrderHistoryIndexRoute
+  '/order/': typeof OrderIndexRoute
+  '/scan/': typeof ScanIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
+  '/_layout/products/$category/': typeof LayoutProductsCategoryIndexRoute
+  '/_layout/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
+  '/_layout/products/$category/$subcategory/': typeof LayoutProductsCategorySubcategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/$' | '/api/rpc/$' | '/demo/api/names'
+  fullPaths:
+    | '/$collectionName'
+    | '/'
+    | '/order-history'
+    | '/order'
+    | '/scan'
+    | '/demo/api/names'
+    | '/products/$category'
+    | '/products/$category/$subcategory/$product'
+    | '/products/$category/$subcategory'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/$' | '/api/rpc/$' | '/demo/api/names'
-  id: '__root__' | '/' | '/api/$' | '/api/rpc/$' | '/demo/api/names'
+  to:
+    | '/$collectionName'
+    | '/'
+    | '/order-history'
+    | '/order'
+    | '/scan'
+    | '/demo/api/names'
+    | '/products/$category'
+    | '/products/$category/$subcategory/$product'
+    | '/products/$category/$subcategory'
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/_layout/$collectionName'
+    | '/_layout/'
+    | '/order-history/'
+    | '/order/'
+    | '/scan/'
+    | '/demo/api/names'
+    | '/_layout/products/$category/'
+    | '/_layout/products/$category/$subcategory/$product'
+    | '/_layout/products/$category/$subcategory/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ApiSplatRoute: typeof ApiSplatRoute
-  ApiRpcSplatRoute: typeof ApiRpcSplatRoute
+  LayoutRoute: typeof LayoutRouteWithChildren
+  OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
+  OrderIndexRoute: typeof OrderIndexRoute
+  ScanIndexRoute: typeof ScanIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$': {
-      id: '/api/$'
-      path: '/api/$'
-      fullPath: '/api/$'
-      preLoaderRoute: typeof ApiSplatRouteImport
+    '/scan/': {
+      id: '/scan/'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof ScanIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/order/': {
+      id: '/order/'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order-history/': {
+      id: '/order-history/'
+      path: '/order-history'
+      fullPath: '/order-history'
+      preLoaderRoute: typeof OrderHistoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_layout/': {
+      id: '/_layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof LayoutIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/$collectionName': {
+      id: '/_layout/$collectionName'
+      path: '/$collectionName'
+      fullPath: '/$collectionName'
+      preLoaderRoute: typeof LayoutCollectionNameRouteImport
+      parentRoute: typeof LayoutRoute
     }
     '/demo/api/names': {
       id: '/demo/api/names'
@@ -92,20 +204,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/rpc/$': {
-      id: '/api/rpc/$'
-      path: '/api/rpc/$'
-      fullPath: '/api/rpc/$'
-      preLoaderRoute: typeof ApiRpcSplatRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_layout/products/$category/': {
+      id: '/_layout/products/$category/'
+      path: '/products/$category'
+      fullPath: '/products/$category'
+      preLoaderRoute: typeof LayoutProductsCategoryIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/products/$category/$subcategory/': {
+      id: '/_layout/products/$category/$subcategory/'
+      path: '/products/$category/$subcategory'
+      fullPath: '/products/$category/$subcategory'
+      preLoaderRoute: typeof LayoutProductsCategorySubcategoryIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/products/$category/$subcategory/$product': {
+      id: '/_layout/products/$category/$subcategory/$product'
+      path: '/products/$category/$subcategory/$product'
+      fullPath: '/products/$category/$subcategory/$product'
+      preLoaderRoute: typeof LayoutProductsCategorySubcategoryProductRouteImport
+      parentRoute: typeof LayoutRoute
     }
   }
 }
 
+interface LayoutRouteChildren {
+  LayoutCollectionNameRoute: typeof LayoutCollectionNameRoute
+  LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutProductsCategoryIndexRoute: typeof LayoutProductsCategoryIndexRoute
+  LayoutProductsCategorySubcategoryProductRoute: typeof LayoutProductsCategorySubcategoryProductRoute
+  LayoutProductsCategorySubcategoryIndexRoute: typeof LayoutProductsCategorySubcategoryIndexRoute
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutCollectionNameRoute: LayoutCollectionNameRoute,
+  LayoutIndexRoute: LayoutIndexRoute,
+  LayoutProductsCategoryIndexRoute: LayoutProductsCategoryIndexRoute,
+  LayoutProductsCategorySubcategoryProductRoute:
+    LayoutProductsCategorySubcategoryProductRoute,
+  LayoutProductsCategorySubcategoryIndexRoute:
+    LayoutProductsCategorySubcategoryIndexRoute,
+}
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ApiSplatRoute: ApiSplatRoute,
-  ApiRpcSplatRoute: ApiRpcSplatRoute,
+  LayoutRoute: LayoutRouteWithChildren,
+  OrderHistoryIndexRoute: OrderHistoryIndexRoute,
+  OrderIndexRoute: OrderIndexRoute,
+  ScanIndexRoute: ScanIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
 }
 export const routeTree = rootRouteImport

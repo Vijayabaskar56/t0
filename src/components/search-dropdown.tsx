@@ -4,12 +4,11 @@ import { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Product } from "../db/schema";
 import { Link } from "@/components/ui/link";
-import { useParams, useRouter } from "next/navigation";
 import { ProductSearchResult } from "@/app/api/search/route";
+import { useRouter } from "@tanstack/react-router";
 
 type SearchResult = Product & { href: string };
 
@@ -138,8 +137,18 @@ export function SearchDropdownComponent() {
                         setIsOpen(false);
                         inputRef.current?.blur();
                       }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setSearchTerm(item.name);
+                          setIsOpen(false);
+                          inputRef.current?.blur();
+                        }
+                      }}
+                      tabIndex={0}
+                      role="option"
+                      aria-selected={index === highlightedIndex}
                     >
-                      <Image
+                      <img
                         loading="eager"
                         decoding="sync"
                         src={item.image_url ?? "/placeholder.svg"}
@@ -147,7 +156,6 @@ export function SearchDropdownComponent() {
                         className="h-10 w-10 pr-2"
                         height={40}
                         width={40}
-                        quality={65}
                       />
                       <span className="text-sm">{item.name}</span>
                     </div>

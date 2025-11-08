@@ -1,28 +1,21 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "4fddf754-457b-4626-bc59-f8f9c04e808f",
+  "id": "f1c3f6e7-ca25-4b70-ae94-db0ebb8a2834",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
       "name": "categories",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
+        "slug": {
+          "name": "slug",
           "type": "text",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -32,7 +25,7 @@
           "name": "collection_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "image_url": {
@@ -41,38 +34,15 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
         }
       },
       "indexes": {
-        "categories_collection_idx": {
-          "name": "categories_collection_idx",
+        "categories_collection_id_idx": {
+          "name": "categories_collection_id_idx",
           "columns": [
             "collection_id"
           ],
           "isUnique": false
-        },
-        "categories_slug_idx": {
-          "name": "categories_slug_idx",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -86,7 +56,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -117,33 +87,9 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
         }
       },
-      "indexes": {
-        "collections_slug_idx": {
-          "name": "collections_slug_idx",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -152,22 +98,15 @@
     "products": {
       "name": "products",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
+        "slug": {
+          "name": "slug",
           "type": "text",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -182,16 +121,16 @@
         },
         "price": {
           "name": "price",
-          "type": "real",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "subcategory_id": {
-          "name": "subcategory_id",
-          "type": "integer",
+        "subcategory_slug": {
+          "name": "subcategory_slug",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "image_url": {
@@ -200,52 +139,29 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
         }
       },
       "indexes": {
-        "products_subcategory_idx": {
-          "name": "products_subcategory_idx",
+        "products_subcategory_slug_idx": {
+          "name": "products_subcategory_slug_idx",
           "columns": [
-            "subcategory_id"
+            "subcategory_slug"
           ],
           "isUnique": false
-        },
-        "products_slug_idx": {
-          "name": "products_slug_idx",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
         }
       },
       "foreignKeys": {
-        "products_subcategory_id_subcategories_id_fk": {
-          "name": "products_subcategory_id_subcategories_id_fk",
+        "products_subcategory_slug_subcategories_slug_fk": {
+          "name": "products_subcategory_slug_subcategories_slug_fk",
           "tableFrom": "products",
           "tableTo": "subcategories",
           "columnsFrom": [
-            "subcategory_id"
+            "subcategory_slug"
           ],
           "columnsTo": [
-            "id"
+            "slug"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -256,22 +172,15 @@
     "subcategories": {
       "name": "subcategories",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
+        "slug": {
+          "name": "slug",
           "type": "text",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -281,7 +190,7 @@
           "name": "subcollection_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "image_url": {
@@ -290,38 +199,15 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
         }
       },
       "indexes": {
-        "subcategories_subcollection_idx": {
-          "name": "subcategories_subcollection_idx",
+        "subcategories_subcollection_id_idx": {
+          "name": "subcategories_subcollection_id_idx",
           "columns": [
             "subcollection_id"
           ],
           "isUnique": false
-        },
-        "subcategories_slug_idx": {
-          "name": "subcategories_slug_idx",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -335,7 +221,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -360,54 +246,93 @@
           "notNull": true,
           "autoincrement": false
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "integer",
+        "category_slug": {
+          "name": "category_slug",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(unixepoch())"
         }
       },
       "indexes": {
-        "subcollections_category_idx": {
-          "name": "subcollections_category_idx",
+        "subcollections_category_slug_idx": {
+          "name": "subcollections_category_slug_idx",
           "columns": [
-            "category_id"
+            "category_slug"
           ],
           "isUnique": false
         }
       },
       "foreignKeys": {
-        "subcollections_category_id_categories_id_fk": {
-          "name": "subcollections_category_id_categories_id_fk",
+        "subcollections_category_slug_categories_slug_fk": {
+          "name": "subcollections_category_slug_categories_slug_fk",
           "tableFrom": "subcollections",
           "tableTo": "categories",
           "columnsFrom": [
-            "category_id"
+            "category_slug"
           ],
           "columnsTo": [
-            "id"
+            "slug"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(datetime('now'))"
+        }
+      },
+      "indexes": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "columns": [
+            "username"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

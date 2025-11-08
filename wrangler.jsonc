@@ -11,7 +11,7 @@
 			"binding": "tanstack_fast_db",
 			"database_name": "tanstack-fast-db",
 			"database_id": "c2c8487f-86e3-41ef-8752-02a2ca834e44",
-			"remote": false
+			"remote": true
 		}
 	]
 }

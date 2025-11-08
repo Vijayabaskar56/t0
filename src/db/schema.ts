@@ -1,93 +1,134 @@
-import { sqliteTable, integer, text, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { sql } from 'drizzle-orm'
+import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
-export const collections = sqliteTable('collections', {
-  id: integer('id', { mode: 'number' }).primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-  slug: text('slug').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-}, (table) => [
-  uniqueIndex('collections_slug_idx').on(table.slug),
-])
+// Collections: ID-based primary key (auto-increment)
+export const collections = sqliteTable("collections", {
+	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	name: text("name").notNull(),
+	slug: text("slug").notNull(),
+});
 
-export const categories = sqliteTable('categories', {
-  id: integer('id', { mode: 'number' }).primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-  slug: text('slug').notNull(),
-  collectionId: integer('collection_id').references(() => collections.id),
-  imageUrl: text('image_url'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-}, (table) => [
-  index('categories_collection_idx').on(table.collectionId),
-  uniqueIndex('categories_slug_idx').on(table.slug),
-])
+// Categories: slug-based primary key
+export const categories = sqliteTable(
+	"categories",
+	{
+		slug: text("slug").primaryKey(),
+		name: text("name").notNull(),
+		collectionId: integer("collection_id")
+			.notNull()
+			.references(() => collections.id, { onDelete: "cascade" }),
+		imageUrl: text("image_url"),
+	},
+	(table) => [index("categories_collection_id_idx").on(table.collectionId)],
+);
 
-export const subcollections = sqliteTable('subcollections', {
-  id: integer('id', { mode: 'number' }).primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-  categoryId: integer('category_id').references(() => categories.id),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-}, (table) => [
-  index('subcollections_category_idx').on(table.categoryId),
-])
+// Subcollections: ID-based primary key (auto-increment)
+export const subcollections = sqliteTable(
+	"subcollections",
+	{
+		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		name: text("name").notNull(),
+		categorySlug: text("category_slug")
+			.notNull()
+			.references(() => categories.slug, { onDelete: "cascade" }),
+	},
+	(table) => [index("subcollections_category_slug_idx").on(table.categorySlug)],
+);
 
-export const subcategories = sqliteTable('subcategories', {
-  id: integer('id', { mode: 'number' }).primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-  slug: text('slug').notNull(),
-  subcollectionId: integer('subcollection_id').references(() => subcollections.id),
-  imageUrl: text('image_url'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-}, (table) => [
-  index('subcategories_subcollection_idx').on(table.subcollectionId),
-  uniqueIndex('subcategories_slug_idx').on(table.slug),
-])
+// Subcategories: slug-based primary key
+export const subcategories = sqliteTable(
+	"subcategories",
+	{
+		slug: text("slug").primaryKey(),
+		name: text("name").notNull(),
+		subcollectionId: integer("subcollection_id")
+			.notNull()
+			.references(() => subcollections.id, { onDelete: "cascade" }),
+		imageUrl: text("image_url"),
+	},
+	(table) => [
+		index("subcategories_subcollection_id_idx").on(table.subcollectionId),
+	],
+);
 
-export const products = sqliteTable('products', {
-  id: integer('id', { mode: 'number' }).primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-  slug: text('slug').notNull(),
-  description: text('description').notNull(),
-  price: real('price').notNull(),
-  subcategoryId: integer('subcategory_id').references(() => subcategories.id),
-  imageUrl: text('image_url'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-}, (table) => [
-  index('products_subcategory_idx').on(table.subcategoryId),
-  uniqueIndex('products_slug_idx').on(table.slug),
-])
+// Products: slug-based primary key
+export const products = sqliteTable(
+	"products",
+	{
+		slug: text("slug").primaryKey(),
+		name: text("name").notNull(),
+		description: text("description").notNull(),
+		price: text("price").notNull(), // Store as text to preserve PostgreSQL numeric precision
+		subcategorySlug: text("subcategory_slug")
+			.notNull()
+			.references(() => subcategories.slug, { onDelete: "cascade" }),
+		imageUrl: text("image_url"),
+	},
+	(table) => [index("products_subcategory_slug_idx").on(table.subcategorySlug)],
+);
+
+// Users: ID-based primary key (auto-increment)
+export const users = sqliteTable("users", {
+	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	username: text("username", { length: 100 }).notNull().unique(),
+	passwordHash: text("password_hash").notNull(),
+	createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+	updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
+});
+
+// Relations
+export const collectionsRelations = relations(collections, ({ many }) => ({
+	categories: many(categories),
+}));
+
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+	collection: one(collections, {
+		fields: [categories.collectionId],
+		references: [collections.id],
+	}),
+	subcollections: many(subcollections),
+}));
+
+export const subcollectionsRelations = relations(
+	subcollections,
+	({ one, many }) => ({
+		category: one(categories, {
+			fields: [subcollections.categorySlug],
+			references: [categories.slug],
+		}),
+		subcategories: many(subcategories),
+	}),
+);
+
+export const subcategoriesRelations = relations(
+	subcategories,
+	({ one, many }) => ({
+		subcollection: one(subcollections, {
+			fields: [subcategories.subcollectionId],
+			references: [subcollections.id],
+		}),
+		products: many(products),
+	}),
+);
+
+export const productsRelations = relations(products, ({ one }) => ({
+	subcategory: one(subcategories, {
+		fields: [products.subcategorySlug],
+		references: [subcategories.slug],
+	}),
+}));
+
+
+export type Product = typeof products.$inferSelect;
+export type NewProduct = typeof products.$inferInsert;
+export type Collection = typeof collections.$inferSelect;
+export type NewCollection = typeof collections.$inferInsert;
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
+export type Subcollection = typeof subcollections.$inferSelect;
+export type NewSubcollection = typeof subcollections.$inferInsert;
+export type Subcategory = typeof subcategories.$inferSelect;
+export type NewSubcategory = typeof subcategories.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
