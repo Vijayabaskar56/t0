@@ -1,0 +1,17 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "tanstack-fast",
+	"compatibility_date": "2025-09-24",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"main": "@tanstack/react-start/server-entry",
+	"d1_databases": [
+		{
+			"binding": "tanstack_fast_db",
+			"database_name": "tanstack-fast-db",
+			"database_id": "c2c8487f-86e3-41ef-8752-02a2ca834e44",
+			"remote": false
+		}
+	]
+}
