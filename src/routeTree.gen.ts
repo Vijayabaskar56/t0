@@ -13,12 +13,11 @@ import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as ScanIndexRouteImport } from './routes/scan/index'
 import { Route as OrderIndexRouteImport } from './routes/order/index'
 import { Route as OrderHistoryIndexRouteImport } from './routes/order-history/index'
-import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
-import { Route as LayoutCollectionNameRouteImport } from './routes/_layout.$collectionName'
-import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
-import { Route as LayoutProductsCategoryIndexRouteImport } from './routes/_layout.products.$category.index'
-import { Route as LayoutProductsCategorySubcategoryIndexRouteImport } from './routes/_layout.products.$category.$subcategory.index'
-import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './routes/_layout.products.$category.$subcategory.$product'
+import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
+import { Route as LayoutCollectionNameRouteImport } from './routes/_layout/$collectionName'
+import { Route as LayoutProductsCategoryIndexRouteImport } from './routes/_layout/products/$category.index'
+import { Route as LayoutProductsCategorySubcategoryIndexRouteImport } from './routes/_layout/products/$category.$subcategory.index'
+import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './routes/_layout/products/$category.$subcategory.$product'
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
@@ -49,11 +48,6 @@ const LayoutCollectionNameRoute = LayoutCollectionNameRouteImport.update({
   path: '/$collectionName',
   getParentRoute: () => LayoutRoute,
 } as any)
-const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
-  id: '/demo/api/names',
-  path: '/demo/api/names',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LayoutProductsCategoryIndexRoute =
   LayoutProductsCategoryIndexRouteImport.update({
     id: '/products/$category/',
@@ -79,7 +73,6 @@ export interface FileRoutesByFullPath {
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
   '/scan': typeof ScanIndexRoute
-  '/demo/api/names': typeof DemoApiNamesRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -90,7 +83,6 @@ export interface FileRoutesByTo {
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
   '/scan': typeof ScanIndexRoute
-  '/demo/api/names': typeof DemoApiNamesRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -103,7 +95,6 @@ export interface FileRoutesById {
   '/order-history/': typeof OrderHistoryIndexRoute
   '/order/': typeof OrderIndexRoute
   '/scan/': typeof ScanIndexRoute
-  '/demo/api/names': typeof DemoApiNamesRoute
   '/_layout/products/$category/': typeof LayoutProductsCategoryIndexRoute
   '/_layout/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/_layout/products/$category/$subcategory/': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -116,7 +107,6 @@ export interface FileRouteTypes {
     | '/order-history'
     | '/order'
     | '/scan'
-    | '/demo/api/names'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -127,7 +117,6 @@ export interface FileRouteTypes {
     | '/order-history'
     | '/order'
     | '/scan'
-    | '/demo/api/names'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -139,7 +128,6 @@ export interface FileRouteTypes {
     | '/order-history/'
     | '/order/'
     | '/scan/'
-    | '/demo/api/names'
     | '/_layout/products/$category/'
     | '/_layout/products/$category/$subcategory/$product'
     | '/_layout/products/$category/$subcategory/'
@@ -150,7 +138,6 @@ export interface RootRouteChildren {
   OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
   OrderIndexRoute: typeof OrderIndexRoute
   ScanIndexRoute: typeof ScanIndexRoute
-  DemoApiNamesRoute: typeof DemoApiNamesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,13 +183,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/$collectionName'
       preLoaderRoute: typeof LayoutCollectionNameRouteImport
       parentRoute: typeof LayoutRoute
-    }
-    '/demo/api/names': {
-      id: '/demo/api/names'
-      path: '/demo/api/names'
-      fullPath: '/demo/api/names'
-      preLoaderRoute: typeof DemoApiNamesRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_layout/products/$category/': {
       id: '/_layout/products/$category/'
@@ -254,7 +234,6 @@ const rootRouteChildren: RootRouteChildren = {
   OrderHistoryIndexRoute: OrderHistoryIndexRoute,
   OrderIndexRoute: OrderIndexRoute,
   ScanIndexRoute: ScanIndexRoute,
-  DemoApiNamesRoute: DemoApiNamesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
