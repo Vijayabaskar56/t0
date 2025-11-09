@@ -1,118 +1,148 @@
-import { drizzle } from 'drizzle-orm/d1'
-import { faker } from '@faker-js/faker'
-import * as schema from '../db/schema'
+import { faker } from "@faker-js/faker";
+import { drizzle } from "drizzle-orm/d1";
+import * as schema from "../db/schema";
 
 export default {
-  async fetch(request: Request, env: any): Promise<Response> {
-    const db = drizzle(env.tanstack_fast_db, { schema })
-    const url = new URL(request.url)
-    const path = url.pathname
+	async fetch(request: Request, env: any): Promise<Response> {
+		const db = drizzle(env.tanstack_fast_db, { schema });
+		const url = new URL(request.url);
+		const path = url.pathname;
 
-    // SEED ENDPOINT
-    if (path === '/seed') {
-      try {
-        console.log('🌱 Starting database seeding...')
-        console.log('🗑️  Clearing existing data...')
+		// SEED ENDPOINT
+		if (path === "/seed") {
+			try {
+				console.log("🌱 Starting database seeding...");
+				console.log("🗑️  Clearing existing data...");
 
-        // Clear in reverse order due to FK constraints
-        await db.delete(schema.products)
-        await db.delete(schema.subcategories)
-        await db.delete(schema.subcollections)
-        await db.delete(schema.categories)
-        await db.delete(schema.collections)
+				// Clear in reverse order due to FK constraints
+				await db.delete(schema.products);
+				await db.delete(schema.subcategories);
+				await db.delete(schema.subcollections);
+				await db.delete(schema.categories);
+				await db.delete(schema.collections);
 
-        console.log('✅ Data cleared')
-        console.log('📦 Generating collections...')
+				console.log("✅ Data cleared");
+				console.log("📦 Generating collections...");
 
-        // Generate collections
-        const collectionNames = [
-          'Electronics', 'Fashion', 'Home & Garden', 'Sports & Outdoors',
-          'Books & Media', 'Toys & Games', 'Health & Beauty', 'Automotive',
-          'Food & Beverages', 'Office Supplies',
-        ]
+				// Generate collections
+				const collectionNames = [
+					"Electronics",
+					"Fashion",
+					"Home & Garden",
+					"Sports & Outdoors",
+					"Books & Media",
+					"Toys & Games",
+					"Health & Beauty",
+					"Automotive",
+					"Food & Beverages",
+					"Office Supplies",
+				];
 
-        const collections = []
-        for (let i = 0; i < 100; i++) {
-          const baseName = faker.helpers.arrayElement(collectionNames)
-          const name = `${baseName} ${faker.commerce.department()}`
-          const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`
-          const result = await db.insert(schema.collections).values({ name, slug }).returning()
-          collections.push(result[0])
-        }
-        console.log(`✅ Created ${collections.length} collections`)
+				const collections = [];
+				for (let i = 0; i < 100; i++) {
+					const baseName = faker.helpers.arrayElement(collectionNames);
+					const name = `${baseName} ${faker.commerce.department()}`;
+					const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`;
+					const result = await db
+						.insert(schema.collections)
+						.values({ name, slug })
+						.returning();
+					collections.push(result[0]);
+				}
+				console.log(`✅ Created ${collections.length} collections`);
 
-        // Generate categories
-        console.log('🏷️  Generating categories...')
-        const categories = []
-        for (let i = 0; i < 200; i++) {
-          const name = `${faker.commerce.productAdjective()} ${faker.commerce.product()}`
-          const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`
-          const collectionId = faker.helpers.arrayElement(collections).id
-          const imageUrl = faker.image.url({ width: 800, height: 600 })
-          const result = await db.insert(schema.categories).values({ name, slug, collectionId, imageUrl }).returning()
-          categories.push(result[0])
-        }
-        console.log(`✅ Created ${categories.length} categories`)
+				// Generate categories
+				console.log("🏷️  Generating categories...");
+				const categories = [];
+				for (let i = 0; i < 200; i++) {
+					const name = `${faker.commerce.productAdjective()} ${faker.commerce.product()}`;
+					const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`;
+					const collectionId = faker.helpers.arrayElement(collections).id;
+					const imageUrl = faker.image.url({ width: 800, height: 600 });
+					const result = await db
+						.insert(schema.categories)
+						.values({ name, slug, collectionId, imageUrl })
+						.returning();
+					categories.push(result[0]);
+				}
+				console.log(`✅ Created ${categories.length} categories`);
 
-        // Generate subcollections
-        console.log('📁 Generating subcollections...')
-        const subcollections = []
-        for (let i = 0; i < 300; i++) {
-          const name = `${faker.commerce.productMaterial()} ${faker.commerce.product()}`
-          const categoryId = faker.helpers.arrayElement(categories).id
-          const result = await db.insert(schema.subcollections).values({ name, categoryId }).returning()
-          subcollections.push(result[0])
-        }
-        console.log(`✅ Created ${subcollections.length} subcollections`)
+				// Generate subcollections
+				console.log("📁 Generating subcollections...");
+				const subcollections = [];
+				for (let i = 0; i < 300; i++) {
+					const name = `${faker.commerce.productMaterial()} ${faker.commerce.product()}`;
+					const categoryId = faker.helpers.arrayElement(categories).id;
+					const result = await db
+						.insert(schema.subcollections)
+						.values({ name, categoryId })
+						.returning();
+					subcollections.push(result[0]);
+				}
+				console.log(`✅ Created ${subcollections.length} subcollections`);
 
-        // Generate subcategories
-        console.log('🔖 Generating subcategories...')
-        const subcategories = []
-        for (let i = 0; i < 400; i++) {
-          const name = `${faker.commerce.productAdjective()} ${faker.commerce.productMaterial()}`
-          const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`
-          const subcollectionId = faker.helpers.arrayElement(subcollections).id
-          const imageUrl = faker.image.url({ width: 800, height: 600 })
-          const result = await db.insert(schema.subcategories).values({ name, slug, subcollectionId, imageUrl }).returning()
-          subcategories.push(result[0])
-        }
-        console.log(`✅ Created ${subcategories.length} subcategories`)
+				// Generate subcategories
+				console.log("🔖 Generating subcategories...");
+				const subcategories = [];
+				for (let i = 0; i < 400; i++) {
+					const name = `${faker.commerce.productAdjective()} ${faker.commerce.productMaterial()}`;
+					const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`;
+					const subcollectionId = faker.helpers.arrayElement(subcollections).id;
+					const imageUrl = faker.image.url({ width: 800, height: 600 });
+					const result = await db
+						.insert(schema.subcategories)
+						.values({ name, slug, subcollectionId, imageUrl })
+						.returning();
+					subcategories.push(result[0]);
+				}
+				console.log(`✅ Created ${subcategories.length} subcategories`);
 
-        // Generate products
-        console.log('🛍️  Generating products...')
-        const products = []
-        for (let i = 0; i < 500; i++) {
-          const name = faker.commerce.productName()
-          const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`
-          const description = faker.commerce.productDescription()
-          const price = Number(faker.commerce.price({ min: 10, max: 5000, dec: 2 }))
-          const subcategoryId = faker.helpers.arrayElement(subcategories).id
-          const imageUrl = faker.image.url({ width: 800, height: 600 })
-          const result = await db.insert(schema.products).values({ name, slug, description, price, subcategoryId, imageUrl }).returning()
-          products.push(result[0])
-        }
-        console.log(`✅ Created ${products.length} products`)
+				// Generate products
+				console.log("🛍️  Generating products...");
+				const products = [];
+				for (let i = 0; i < 500; i++) {
+					const name = faker.commerce.productName();
+					const slug = `${faker.helpers.slugify(name.toLowerCase())}-${i}`;
+					const description = faker.commerce.productDescription();
+					const price = Number(
+						faker.commerce.price({ min: 10, max: 5000, dec: 2 }),
+					);
+					const subcategoryId = faker.helpers.arrayElement(subcategories).id;
+					const imageUrl = faker.image.url({ width: 800, height: 600 });
+					const result = await db
+						.insert(schema.products)
+						.values({ name, slug, description, price, subcategoryId, imageUrl })
+						.returning();
+					products.push(result[0]);
+				}
+				console.log(`✅ Created ${products.length} products`);
 
-        const summary = `✅ Seeding complete!
+				const summary = `✅ Seeding complete!
 📊 Summary:
   - Collections: ${collections.length}
   - Categories: ${categories.length}
   - Subcollections: ${subcollections.length}
   - Subcategories: ${subcategories.length}
-  - Products: ${products.length}`
+  - Products: ${products.length}`;
 
-        console.log(summary)
-        return new Response(summary, { status: 200, headers: { 'Content-Type': 'text/plain' } })
-      } catch (error) {
-        console.error('❌ Error seeding database:', error)
-        return new Response(`Error: ${error}`, { status: 500, headers: { 'Content-Type': 'text/plain' } })
-      }
-    }
+				console.log(summary);
+				return new Response(summary, {
+					status: 200,
+					headers: { "Content-Type": "text/plain" },
+				});
+			} catch (error) {
+				console.error("❌ Error seeding database:", error);
+				return new Response(`Error: ${error}`, {
+					status: 500,
+					headers: { "Content-Type": "text/plain" },
+				});
+			}
+		}
 
-    // DATABASE VIEWER
-    if (path === '/') {
-      return new Response(
-        `<!DOCTYPE html>
+		// DATABASE VIEWER
+		if (path === "/") {
+			return new Response(
+				`<!DOCTYPE html>
 <html>
 <head>
   <title>D1 Admin Panel</title>
@@ -171,40 +201,45 @@ export default {
   </script>
 </body>
 </html>`,
-        { headers: { 'Content-Type': 'text/html' } }
-      )
-    }
+				{ headers: { "Content-Type": "text/html" } },
+			);
+		}
 
-    // TABLE VIEWERS
-    let data: any[] = []
-    let tableName = ''
+		// TABLE VIEWERS
+		let data: any[] = [];
+		let tableName = "";
 
-    if (path === '/collections') {
-      data = await db.select().from(schema.collections).limit(100).all()
-      tableName = 'Collections'
-    } else if (path === '/categories') {
-      data = await db.select().from(schema.categories).limit(100).all()
-      tableName = 'Categories'
-    } else if (path === '/subcollections') {
-      data = await db.select().from(schema.subcollections).limit(100).all()
-      tableName = 'Subcollections'
-    } else if (path === '/subcategories') {
-      data = await db.select().from(schema.subcategories).limit(100).all()
-      tableName = 'Subcategories'
-    } else if (path === '/products') {
-      data = await db.select().from(schema.products).limit(100).all()
-      tableName = 'Products'
-    }
+		if (path === "/collections") {
+			data = await db.select().from(schema.collections).limit(100).all();
+			tableName = "Collections";
+		} else if (path === "/categories") {
+			data = await db.select().from(schema.categories).limit(100).all();
+			tableName = "Categories";
+		} else if (path === "/subcollections") {
+			data = await db.select().from(schema.subcollections).limit(100).all();
+			tableName = "Subcollections";
+		} else if (path === "/subcategories") {
+			data = await db.select().from(schema.subcategories).limit(100).all();
+			tableName = "Subcategories";
+		} else if (path === "/products") {
+			data = await db.select().from(schema.products).limit(100).all();
+			tableName = "Products";
+		}
 
-    if (!data.length) {
-      return new Response('No data or invalid path', { status: 404 })
-    }
+		if (!data.length) {
+			return new Response("No data or invalid path", { status: 404 });
+		}
 
-    const keys = Object.keys(data[0])
-    const rows = data.map(row => `<tr>${keys.map(key => `<td>${row[key] ?? ''}</td>`).join('')}</tr>`).join('')
+		const keys = Object.keys(data[0]);
+		const rows = data
+			.map(
+				(row) =>
+					`<tr>${keys.map((key) => `<td>${row[key] ?? ""}</td>`).join("")}</tr>`,
+			)
+			.join("");
 
-    return new Response(
-      `<!DOCTYPE html>
+		return new Response(
+			`<!DOCTYPE html>
 <html>
 <head>
   <title>${tableName} - D1 Admin</title>
@@ -225,12 +260,12 @@ export default {
   <h1>${tableName}</h1>
   <div class="count">Showing ${data.length} records (max 100)</div>
   <table>
-    <thead><tr>${keys.map(key => `<th>${key}</th>`).join('')}</tr></thead>
+    <thead><tr>${keys.map((key) => `<th>${key}</th>`).join("")}</tr></thead>
     <tbody>${rows}</tbody>
   </table>
 </body>
 </html>`,
-      { headers: { 'Content-Type': 'text/html' } }
-    )
-  },
-}
+			{ headers: { "Content-Type": "text/html" } },
+		);
+	},
+};

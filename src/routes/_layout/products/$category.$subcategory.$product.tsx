@@ -1,18 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProductLink } from "@/components/ui/product-card";
 import {
-	getProductDetails,
-	getProductsForSubcategory,
-} from "@/routes/api/server-funtions";
+	getProductDetailsOptions,
+	getProductsForSubcategoryOptions,
+} from "@/api/query-options";
+import { ProductLink } from "@/components/ui/product-card";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/$product",
 )({
 	component: RouteComponent,
-	loader: async ({ params }) => {
+	loader: async ({ params, context }) => {
 		const [productData, relatedUnshifted] = await Promise.all([
-			getProductDetails({ data: { product: params.product } }),
-			getProductsForSubcategory({ data: { subcategory: params.subcategory } }),
+			context.queryClient.ensureQueryData(
+				getProductDetailsOptions(params.product),
+			),
+			context.queryClient.ensureQueryData(
+				getProductsForSubcategoryOptions(params.subcategory),
+			),
 		]);
 		return { productData, relatedUnshifted };
 	},

@@ -1,18 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProductLink } from "@/components/ui/product-card";
 import {
-	getProductForSubcategory,
-	getSubCategoryProductCount,
-} from "@/routes/api/server-funtions";
+	getProductForSubcategoryOptions,
+	getSubCategoryProductCountOptions,
+} from "@/api/query-options";
+import { ProductLink } from "@/components/ui/product-card";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/",
 )({
 	component: RouteComponent,
-	loader: async ({ params }) => {
+	loader: async ({ params, context }) => {
 		const [products, productCount] = await Promise.all([
-			getProductForSubcategory({ data: { subcategory: params.subcategory } }),
-			getSubCategoryProductCount({ data: { subcategory: params.subcategory } }),
+			context.queryClient.ensureQueryData(
+				getProductForSubcategoryOptions(params.subcategory),
+			),
+			context.queryClient.ensureQueryData(
+				getSubCategoryProductCountOptions(params.subcategory),
+			),
 		]);
 		return { products, productCount };
 	},

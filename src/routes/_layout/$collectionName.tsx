@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getCollectionDetails } from "@/routes/api/server-funtions";
+import { getCollectionDetailsOptions } from "@/api/query-options";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
 	component: RouteComponent,
-	loader: async ({ params }) => {
-		return await getCollectionDetails({
-			data: { collectionName: params.collectionName },
-		});
+	loader: async ({ params, context }) => {
+		return await context.queryClient.ensureQueryData(
+			getCollectionDetailsOptions(params.collectionName),
+		);
 	},
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,

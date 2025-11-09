@@ -1,13 +1,13 @@
 {
-  "name": "admin",
-  "main": "admin.ts",
-  "compatibility_date": "2025-09-24",
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [
-    {
-      "binding": "tanstack_fast_db",
-      "database_name": "tanstack-fast-db",
-      "database_id": "c2c8487f-86e3-41ef-8752-02a2ca834e44"
-    }
-  ]
+	"name": "admin",
+	"main": "admin.ts",
+	"compatibility_date": "2025-09-24",
+	"compatibility_flags": ["nodejs_compat"],
+	"d1_databases": [
+		{
+			"binding": "tanstack_fast_db",
+			"database_name": "tanstack-fast-db",
+			"database_id": "c2c8487f-86e3-41ef-8752-02a2ca834e44"
+		}
+	]
 }
