@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getCollections, getProductCount } from "@/routes/api/server-funtions";
+import {
+	getCollectionsOptions,
+	getProductCountOptions,
+} from "@/api/query-options";
 
 export const Route = createFileRoute("/_layout/")({
 	component: RouteComponent,
-	loader: async () => {
+	loader: async ({ context }) => {
 		const [collections, productCount] = await Promise.all([
-			getCollections(),
-			getProductCount(),
+			context.queryClient.ensureQueryData(getCollectionsOptions()),
+			context.queryClient.ensureQueryData(getProductCountOptions()),
 		]);
 		return { collections, productCount };
 	},
@@ -16,7 +19,7 @@ function RouteComponent() {
 	const { collections, productCount } = Route.useLoaderData();
 	return (
 		<div className="w-full p-4">
-			<div className="mb-2 w-full flex-grow border-b-[1px] border-accent1 text-sm font-semibold text-black">
+			<div className="mb-2 w-full grow border-b border-accent1 text-sm font-semibold text-black">
 				Explore {productCount.at(0)?.count.toLocaleString()} productssss
 			</div>
 			{collections.map((collection) => (
@@ -28,8 +31,8 @@ function RouteComponent() {
 								preload="intent"
 								key={category.name}
 								className="flex w-[125px] flex-col items-center text-center"
-								to="/products/$collectionName"
-								params={{ collectionName: category.slug }}
+								to="/products/$category"
+								params={{ category: category.slug }}
 							>
 								<img
 									decoding="sync"

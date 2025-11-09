@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-	getCategory,
-	getCategoryProductCount,
-} from "@/routes/api/server-funtions";
+	getCategoryOptions,
+	getCategoryProductCountOptions,
+} from "@/api/query-options";
 
 export const Route = createFileRoute("/_layout/products/$category/")({
 	component: RouteComponent,
-	loader: async ({ params }) => {
+	loader: async ({ params, context }) => {
 		const [category, categoryProductCount] = await Promise.all([
-			getCategory({ data: { category: params.category } }),
-			getCategoryProductCount({ data: { category: params.category } }),
+			context.queryClient.ensureQueryData(getCategoryOptions(params.category)),
+			context.queryClient.ensureQueryData(
+				getCategoryProductCountOptions(params.category),
+			),
 		]);
 		return { category, categoryProductCount };
 	},

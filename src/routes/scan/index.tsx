@@ -1,28 +1,26 @@
-import { scan } from "react-scan"; // import this BEFORE react
+import { createFileRoute, Link } from "@tanstack/react-router";
 import React from "react";
-import { createFileRoute , Link } from '@tanstack/react-router'
+import { scan } from "react-scan"; // import this BEFORE react
 
-export const Route = createFileRoute('/scan/')({
-  component: ScanPage,
-})
-
-
+export const Route = createFileRoute("/scan/")({
+	component: ScanPage,
+});
 
 if (typeof window !== "undefined") {
-  scan({
-    enabled: true,
-  });
+	scan({
+		enabled: true,
+	});
 }
 
 function ScanPage() {
-  return (
-    <div className="flex h-screen flex-col items-center justify-center">
-      <p className="mb-4 text-lg">
-        React Scan has loaded, you can now start exploring the site
-      </p>
-      <Link href="/" className="text-blue-500 underline hover:text-blue-700">
-        Back to home
-      </Link>
-    </div>
-  );
+	return (
+		<div className="flex h-screen flex-col items-center justify-center">
+			<p className="mb-4 text-lg">
+				React Scan has loaded, you can now start exploring the site
+			</p>
+			<Link href="/" className="text-blue-500 underline hover:text-blue-700">
+				Back to home
+			</Link>
+		</div>
+	);
 }

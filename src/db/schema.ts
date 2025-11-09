@@ -1,6 +1,5 @@
-import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Collections: ID-based primary key (auto-increment)
 export const collections = sqliteTable("collections", {
@@ -118,7 +117,6 @@ export const productsRelations = relations(products, ({ one }) => ({
 		references: [subcategories.slug],
 	}),
 }));
-
 
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
