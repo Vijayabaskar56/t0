@@ -13,7 +13,7 @@ const config = defineConfig({
     }),
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({}),
     viteReact({
       babel: {
         plugins: ['babel-plugin-react-compiler'],

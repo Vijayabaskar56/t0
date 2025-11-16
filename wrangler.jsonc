@@ -10,16 +10,20 @@
 		{
 			"binding": "tanstack_fast_db",
 			"database_name": "tanstack-fast-db",
-			"database_id": "c2c8487f-86e3-41ef-8752-02a2ca834e44",
+			"database_id": "d83bd6b6-e112-4640-853b-d8cab86732ba",
 			"remote": true
 		}
 	],
 	"kv_namespaces": [
 		{
 			"binding": "CACHE",
-			"id": "b69cd3d2ff884069bcf6e148270b6ca2",
-			"preview_id": "ad6a1b6b5cb84c9f9121cf763fa90188",
+			"id": "2069204dd71a4931884227dc8724ab3d",
 			"remote": true
 		}
-	]
+	],
+	"r2_buckets": [{
+		"bucket_name": "tanstack-faster-images",
+		"binding": "BUCKET",
+		"remote": true
+	}]
 }

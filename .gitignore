@@ -23,7 +23,7 @@ build
 *.swo
 *~
 .DS_Store
-
+.git
 # Logs
 logs
 *.log
@@ -48,3 +48,8 @@ coverage
 .cache
 tmp
 temp
+migration-images
+.wrangler
+data
+.claude
+.cursor
