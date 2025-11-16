@@ -3,18 +3,39 @@ import {
 	getCategoryOptions,
 	getCategoryProductCountOptions,
 } from "@/api/query-options";
+import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/_layout/products/$category/")({
-	component: RouteComponent,
 	loader: async ({ params, context }) => {
+	console.log(params , 'params')
 		const [category, categoryProductCount] = await Promise.all([
 			context.queryClient.ensureQueryData(getCategoryOptions(params.category)),
-			context.queryClient.ensureQueryData(
-				getCategoryProductCountOptions(params.category),
-			),
+			context.queryClient.ensureQueryData(getCategoryProductCountOptions(params.category)),
 		]);
+		console.log(category , categoryProductCount)
 		return { category, categoryProductCount };
 	},
+	component: RouteComponent,
+  head: ({ loaderData }) => {
+  const examples = loaderData?.category?.subcollections?.slice(0, 2)
+    .map((s) => s.name)
+    .join(", ")
+    .toLowerCase();
+  console.log(loaderData , 'loader')
+
+    return {
+      meta: [
+        {
+          charSet: "utf-8",
+        },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+      ...seo({ title: loaderData?.category?.name }),
+      ],
+    }
+  },
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
 });

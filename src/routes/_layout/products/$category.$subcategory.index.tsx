@@ -4,13 +4,13 @@ import {
 	getSubCategoryProductCountOptions,
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
+import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/",
 )({
-	component: RouteComponent,
 	loader: async ({ params, context }) => {
-		const [products, productCount] = await Promise.all([
+		const [subcategory, subcategoryCount] = await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductForSubcategoryOptions(params.subcategory),
 			),
@@ -18,8 +18,24 @@ export const Route = createFileRoute(
 				getSubCategoryProductCountOptions(params.subcategory),
 			),
 		]);
-		return { products, productCount };
+		return { products: subcategory, productCount: subcategoryCount };
 	},
+ head: ({ loaderData , params }) => {
+   console.log(loaderData , 'loaderdata' , params)
+   return {
+      meta: [
+        {
+          charSet: "utf-8",
+        },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+      ...seo({ title : `${params.subcategory.slice(0, 1).toUpperCase() + params.subcategory.slice(1).toLowerCase().replaceAll('-', ' ')}` }),
+      ],
+    }
+  },
+	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
 });

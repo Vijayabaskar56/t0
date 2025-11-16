@@ -8,6 +8,7 @@ import {
 	getProductDetails,
 	getProductForSubcategory,
 	getProductsForSubcategory,
+	getRelatedProducts,
 	getSubCategoryProductCount,
 } from "./server-funtions";
 
@@ -77,6 +78,18 @@ export const getProductsForSubcategoryOptions = (subcategory: string) =>
 		queryFn: () =>
 			getProductsForSubcategory({
 				data: { subcategory },
+			}),
+	});
+
+export const getRelatedProductsOptions = (
+	subcategory: string,
+	currentProductSlug: string,
+) =>
+	queryOptions({
+		queryKey: ["related-products", subcategory, currentProductSlug],
+		queryFn: () =>
+			getRelatedProducts({
+				data: { subcategory, currentProductSlug },
 			}),
 	});
 

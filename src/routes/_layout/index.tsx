@@ -3,16 +3,35 @@ import {
 	getCollectionsOptions,
 	getProductCountOptions,
 } from "@/api/query-options";
+import { seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/_layout/")({
+  loader: async ({ context }) => {
+    const [collections, productCount] = await Promise.all([
+      context.queryClient.ensureQueryData(getCollectionsOptions()),
+      context.queryClient.ensureQueryData(getProductCountOptions()),
+    ]);
+    return { collections, productCount };
+  },
+  head: ({ loaderData }) => {
+    console.log(loaderData ,'loader-data');
+    return {
+      meta: [
+        {
+          charSet: "utf-8",
+        },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+        {
+          title: "TanStack Start Starter",
+        },
+      ],
+      ...seo({ title: loaderData?.collections?.[0]?.name }),
+    };
+  },
 	component: RouteComponent,
-	loader: async ({ context }) => {
-		const [collections, productCount] = await Promise.all([
-			context.queryClient.ensureQueryData(getCollectionsOptions()),
-			context.queryClient.ensureQueryData(getProductCountOptions()),
-		]);
-		return { collections, productCount };
-	},
 });
 
 function RouteComponent() {

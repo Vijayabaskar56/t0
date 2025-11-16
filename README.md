@@ -1,328 +1,102 @@
-Welcome to your new TanStack app! 
+## TanStack Fast
 
-# Getting Started
+A highly performant e-commerce template using TanStack and Cloudflare, inspired by [NextFaster](https://github.com/ethanniser/next-faster) by [@ethanniser](https://x.com/ethanniser), [@RhysSullivan](https://x.com/RhysSullivan) and [@armans-code](https://x.com/ksw_arman). This version showcases the power of TanStack Router, Query, and Start deployed on Cloudflare's edge platform.
 
-To run this application:
+### Design notes
 
-```bash
-pnpm install
-pnpm start
-```
+**Inspired by the original [NextFaster twitter thread](https://x.com/ethanniser/status/1848442738204643330)**
 
-# Building For Production
+- Uses [TanStack Start](https://tanstack.com/start/latest) with [TanStack Router](https://tanstack.com/router/latest) and [TanStack Query](https://tanstack.com/query/latest)
+  - All mutations are managed via TanStack Query with optimistic updates
+  - Server-side rendering with TanStack Start for optimal performance
+- [TanStack Router preloading](https://tanstack.com/router/latest/docs/framework/react/guide/preloading) is used to prefetch data and components
+  - When deployed, pages are served from Cloudflare's edge network
+  - Dynamic data (cart, user sessions) is managed by TanStack Query with intelligent caching
+- Uses [Drizzle ORM](https://orm.drizzle.team/docs/overview) on top of [Cloudflare D1](https://developers.cloudflare.com/d1/)
+- Images stored on [Cloudflare R2](https://developers.cloudflare.com/r2/)
+- [Cloudflare KV](https://developers.cloudflare.com/workers/runtime-apis/kv/) for edge caching and session storage
+- Used [v0](https://v0.dev) to generate all initial UIs, check out some of the threads we were particularly impressed by:
+  - [v0 makes pretty impressive search dropdown without a library](https://v0.dev/chat/lFfc68X3fir?b=b_1o4tkiC9EEm&p=0)
+  - [recreating 'order' page](https://v0.dev/chat/RTBa8dXhx03?b=b_4RguNNUEhLh)
+  - [recreating 'login' page](https://v0.dev/chat/tijwMFByNX9?b=b_XnRtduKn2oe)
+- Enhanced with TanStack Query for data fetching and state management
+- Integrated TanStack Router for type-safe navigation and preloading
 
-To build this application for production:
+#### DATA
 
-```bash
-pnpm build
-```
+- Product data and images sourced from the original NextFaster project
 
-## Testing
+### Deployment
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+- Make sure Cloudflare Workers is configured with D1 database, KV namespace, and R2 bucket
+- Run `pnpm db:push` to apply schema to your D1 database
+- Run `pnpm deploy` to deploy to Cloudflare Workers
 
-```bash
-pnpm test
-```
+### Local dev
 
-## Styling
+- Run `wrangler login` to authenticate with Cloudflare.
+- Set up your environment variables in `.dev.vars` or use Cloudflare environment variables.
+- Run `pnpm install` && `pnpm dev` to start developing locally with Wrangler.
+- The original data includes 1,000,000+ products with full schema and unique images. To seed your D1 database:
+  - Import the data using `wrangler d1 execute tanstack-fast-db --file=data.sql` (if available)
+  - Or use the admin script: `pnpm db:admin` for database management
+- For DB migrations with `drizzle-kit`:
+  - Run `pnpm db:push` to apply schema to your D1 database
+  - Run `pnpm db:studio` to open Drizzle Studio for database inspection
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+### Performance
 
+This TanStack + Cloudflare version leverages:
+- **TanStack Router preloading** for instant navigation
+- **TanStack Query caching** for optimal data management
+- **Cloudflare Edge Network** for global low-latency delivery
+- **Cloudflare KV** for edge caching and session storage
+- **Cloudflare D1** for serverless SQL at the edge
+- **Cloudflare R2** for fast image delivery globally
 
-## Linting & Formatting
+*Performance metrics will be added after deployment and testing.*
 
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
+### Costs
 
+This project is deployed on Cloudflare Workers, leveraging Cloudflare's edge platform for optimal performance and cost efficiency.
 
-```bash
-pnpm lint
-pnpm format
-pnpm check
-```
+*Cost analysis will be added after running the TanStack + Cloudflare version in production.*
 
+#### Expected Benefits:
 
-## Shadcn
+- **Cloudflare Workers**: Free tier includes 100,000 requests/day
+- **D1 Database**: 5GB storage, 25 million reads/day free
+- **R2 Storage**: 10GB storage free, 1 million Class A operations/month free
+- **KV Storage**: 100,000 reads/day, 1,000 writes/day free
+- **Edge Network**: Global CDN with no egress fees
 
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+The TanStack + Cloudflare stack is designed to be more cost-effective than the original Vercel deployment while maintaining similar performance characteristics through intelligent caching and edge optimization.
 
-```bash
-pnpx shadcn@latest add button
-```
+### Architecture Highlights
 
+#### TanStack Integration
+- **TanStack Router**: Type-safe routing with automatic preloading and code splitting
+- **TanStack Query**: Intelligent data fetching, caching, and synchronization
+- **TanStack Start**: Full-stack React framework with SSR/SSG capabilities
+- **Optimistic Updates**: Smooth user experience with instant UI feedback
 
-## T3Env
+#### Cloudflare Edge Platform
+- **Workers**: Serverless compute at the edge for low-latency request handling
+- **D1 Database**: SQLite-compatible serverless SQL database
+- **R2 Storage**: S3-compatible object storage with no egress fees
+- **KV Storage**: Global key-value store for caching and session data
 
-- You can use T3Env to add type safety to your environment variables.
-- Add Environment variables to the `src/env.mjs` file.
-- Use the environment variables in your code.
+#### Performance Optimizations
+- **Router Preloading**: Fetch data and components before navigation
+- **Query Caching**: Smart caching with background refetching
+- **Edge Caching**: KV-based caching for frequently accessed data
+- **Image Optimization**: R2 + Cloudflare Image Resizing for optimal delivery
 
-### Usage
+### Credits & Inspiration
 
-```ts
-import { env } from "@/env";
+This project is inspired by and adapted from [NextFaster](https://github.com/ethanniser/next-faster) by [@ethanniser](https://x.com/ethanniser), [@RhysSullivan](https://x.com/RhysSullivan) and [@armans-code](https://x.com/ksw_arman). 
 
-console.log(env.VITE_APP_TITLE);
-```
+The original NextFaster project demonstrated the incredible performance possible with Next.js 15 and Vercel's platform. This TanStack + Cloudflare version aims to showcase similar performance characteristics while leveraging the power of TanStack's ecosystem and Cloudflare's global edge network.
 
-
-
-
-
-
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add another a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
-
-```bash
-pnpm add @tanstack/react-query @tanstack/react-query-devtools
-```
-
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
-
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
-```
-
-You can also add TanStack Query Devtools to the root route (optional).
-
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Now you can use `useQuery` to fetch your data.
-
-```tsx
-import { useQuery } from "@tanstack/react-query";
-
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
-
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
-
-```bash
-pnpm add @tanstack/store
-```
-
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+**Original Project**: [NextFaster](https://github.com/ethanniser/next-faster)  
+**Original Thread**: [Twitter/X](https://x.com/ethanniser/status/1848442738204643330)

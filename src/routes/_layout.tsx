@@ -1,10 +1,23 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { getCollectionsOptions } from "@/api/query-options";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_layout")({
 	component: RouteComponent,
-	loader: ({ context }) =>
-		context.queryClient.ensureQueryData(getCollectionsOptions()),
+	loader: ({ context }) => context.queryClient.ensureQueryData(getCollectionsOptions()),
+	head: ({  }) => ({
+		meta: [
+			{
+				charSet: "utf-8",
+			},
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1",
+			},
+			{
+				title: "TanStack Start Starter",
+			},
+		],
+	}),
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
 });
