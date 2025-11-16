@@ -5,6 +5,7 @@ import {
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
 import { seo } from "@/lib/seo";
+import { AddToCartForm } from "@/components/add-to-cart-form";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/$product",
@@ -103,7 +104,7 @@ function RouteComponent() {
 				<p className="text-xl font-bold">
 					${parseFloat(productData?.price).toFixed(2)}
 				</p>
-				{/* <AddToCartForm productSlug={productData?.slug ?? ""} /> */}
+				 <AddToCartForm productSlug={productData?.slug ?? ""} />
 			</div>
 			<div className="pt-8">
 				{related.length > 0 && (

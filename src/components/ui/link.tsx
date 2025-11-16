@@ -57,11 +57,17 @@ export const Link: typeof NextLink = (({ children, ...props }) => {
 						if (!imageCache.has(String(props.href))) {
 							void prefetchImages(String(props.href)).then((images) => {
 								imageCache.set(String(props.href), images);
+								// Immediately prefetch critical images with higher priority
+								images.slice(0, 3).forEach((image) => {
+									if (image.loading !== "lazy") {
+										prefetchImageCritical(image);
+									}
+								});
 							}, console.error);
 						}
 
 						observer.unobserve(entry.target);
-					}, 300);
+					}, 150);
 				} else if (prefetchTimeout) {
 					clearTimeout(prefetchTimeout);
 					prefetchTimeout = null;
@@ -111,6 +117,20 @@ export const Link: typeof NextLink = (({ children, ...props }) => {
 		</NextLink>
 	);
 }) as typeof NextLink;
+
+function prefetchImageCritical(image: PrefetchImage) {
+	if (seen.has(image.srcset)) {
+		return;
+	}
+	const img = new Image();
+	img.decoding = "async";
+	img.fetchPriority = "high";
+	img.sizes = image.sizes;
+	seen.add(image.srcset);
+	img.srcset = image.srcset;
+	img.src = image.src;
+	img.alt = image.alt;
+}
 
 function prefetchImage(image: PrefetchImage) {
 	if (image.loading === "lazy" || seen.has(image.srcset)) {

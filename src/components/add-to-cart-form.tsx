@@ -1,11 +1,13 @@
 "use client";
-import { useActionState } from "react";
-import { addToCart } from "@/lib/actions";
+import { addToCart } from "@/api/server-funtions";
 
 export function AddToCartForm({ productSlug }: { productSlug: string }) {
-	const [message, formAction, isPending] = useActionState(addToCart, null);
+	const handleSubmit = async () => {
+		await addToCart({ data: { productSlug } });
+	};
+
 	return (
-		<form className="flex flex-col gap-2" action={formAction}>
+		<form className="flex flex-col gap-2" action={handleSubmit}>
 			<input type="hidden" name="productSlug" value={productSlug} />
 			<button
 				type="submit"
@@ -13,8 +15,6 @@ export function AddToCartForm({ productSlug }: { productSlug: string }) {
 			>
 				Add to cart
 			</button>
-			{isPending && <p>Adding to cart...</p>}
-			{!isPending && message && <p>{message}</p>}
 		</form>
 	);
 }
