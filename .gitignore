@@ -53,3 +53,5 @@ migration-images
 data
 .claude
 .cursor
+.tanstack
+.wrangler
