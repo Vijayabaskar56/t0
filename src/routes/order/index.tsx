@@ -352,7 +352,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 							height={256}
 						/>
 					</div>
-					<div className="max-w-[100px] flex-grow sm:max-w-full">
+					<div className="max-w-[100px] grow sm:max-w-full">
 						<h2 className="font-semibold">{product.name}</h2>
 						<p className="text-sm md:text-base">{product.description}</p>
 					</div>

@@ -4,10 +4,100 @@ import z from "zod";
 import { db } from "@/db";
 import {
 	categories,
+	type NewUser,
 	products,
 	subcategories,
 	subcollections,
+	users,
 } from "@/db/schema";
+import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
+
+const authSchema = z.object({
+	username: z.string().min(1),
+	password: z.string().min(1),
+});
+
+const signUp = createServerFn({ method: "POST" })
+	.inputValidator(authSchema)
+	.handler(async (ctx) => {
+		try {
+			const { username, password } = ctx.data;
+
+			// Rate limiting check (simplified version)
+			// Note: You'll need to implement rate limiting utilities
+			const existingUser = await db
+				.select()
+				.from(users)
+				.where(eq(users.username, username))
+				.limit(1);
+
+			if (existingUser.length > 0) {
+				return { error: "Username already taken. Please try again." };
+			}
+
+			// Password hashing (simplified - you'll need to implement hashPassword)
+			const passwordHash = password; // Replace with: await hashPassword(password);
+
+			const newUser: NewUser = {
+				username,
+				passwordHash,
+			};
+
+			const [createdUser] = await db.insert(users).values(newUser).returning();
+
+			if (!createdUser) {
+				return { error: "Failed to create user. Please try again." };
+			}
+
+			// Session setting (simplified - you'll need to implement setSession)
+			// await setSession(createdUser);
+
+			return { success: true, user: createdUser };
+		} catch (error) {
+			console.error("Error signing up:", error);
+			throw new Error("Failed to sign up");
+		}
+	});
+
+const signIn = createServerFn({ method: "POST" })
+	.inputValidator(authSchema)
+	.handler(async (ctx) => {
+		try {
+			const { username, password } = ctx.data;
+
+			// Rate limiting check (simplified)
+			// Note: You'll need to implement rate limiting utilities
+
+			const user = await db
+				.select({
+					user: users,
+				})
+				.from(users)
+				.where(eq(users.username, username))
+				.limit(1);
+
+			if (user.length === 0) {
+				return { error: "Invalid username or password. Please try again." };
+			}
+
+			const { user: foundUser } = user[0];
+
+			// Password comparison (simplified - you'll need to implement comparePasswords)
+			const isPasswordValid = password === foundUser.passwordHash; // Replace with: await comparePasswords(password, foundUser.passwordHash);
+
+			if (!isPasswordValid) {
+				return { error: "Invalid username or password. Please try again." };
+			}
+
+			// Session setting (simplified - you'll need to implement setSession)
+			// await setSession(foundUser);
+
+			return { success: true, user: foundUser };
+		} catch (error) {
+			console.error("Error signing in:", error);
+			throw new Error("Failed to sign in");
+		}
+	});
 
 const getCollections = createServerFn({ method: "GET" }).handler(
 	async (ctx) => {
@@ -379,6 +469,159 @@ const getProductCount = createServerFn({ method: "GET" }).handler(
 	},
 );
 
+const cartSchema = z.array(
+	z.object({
+		productSlug: z.string(),
+		quantity: z.number(),
+	}),
+);
+
+export type CartItem = z.infer<typeof cartSchema>[number];
+
+// Helper function to set cart cookie
+function updateCart(newItems: CartItem[]) {
+	const cookieValue = encodeURIComponent(JSON.stringify(newItems));
+	const maxAge = 60 * 60 * 24 * 7; // 1 week
+	const cookieOptions = `cart=${cookieValue}; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}; Path=/`;
+	setResponseHeader("Set-Cookie", cookieOptions);
+}
+
+const getCart = createServerFn({ method: "GET" }).handler(async (ctx) => {
+	try {
+		// Get cart cookie from request headers
+		const cartCookie = getRequest().headers.get("cookie")
+			?.match(/cart=([^;]+)/)?.[1];
+
+		if (!cartCookie) {
+			return [];
+		}
+
+		try {
+			return cartSchema.parse(JSON.parse(decodeURIComponent(cartCookie)));
+		} catch {
+			console.error("Failed to parse cart cookie");
+			return [];
+		}
+	} catch (error) {
+		console.error("Error getting cart:", error);
+		throw new Error("Failed to get cart");
+	}
+});
+
+const detailedCart = createServerFn({ method: "GET" }).handler(async (ctx) => {
+	try {
+		const cart = await getCart();
+
+		if (cart.length === 0) {
+			return [];
+		}
+
+		const products = await db.query.products.findMany({
+			where: (products, { inArray }) =>
+				inArray(
+					products.slug,
+					cart.map((item) => item.productSlug),
+				),
+			with: {
+				subcategory: {
+					with: {
+						subcollection: true,
+					},
+				},
+			},
+		});
+
+		const withQuantity = products.map((product) => ({
+			...product,
+			quantity:
+				cart.find((item) => item.productSlug === product.slug)?.quantity ?? 0,
+		}));
+
+		return withQuantity;
+	} catch (error) {
+		console.error("Error getting detailed cart:", error);
+		throw new Error("Failed to get detailed cart");
+	}
+});
+
+const addToCart = createServerFn({ method: "POST" })
+	.inputValidator(
+		z.object({
+			productSlug: z.string(),
+		}),
+	)
+	.handler(async (ctx) => {
+		try {
+			const { productSlug } = ctx.data;
+			const prevCart = await getCart();
+
+			const itemAlreadyExists = prevCart.find(
+				(item) => item.productSlug === productSlug,
+			);
+
+			if (itemAlreadyExists) {
+				const newQuantity = itemAlreadyExists.quantity + 1;
+				const newCart = prevCart.map((item) => {
+					if (item.productSlug === productSlug) {
+						return {
+							...item,
+							quantity: newQuantity,
+						};
+					}
+					return item;
+				});
+
+				updateCart(newCart);
+				return "Item quantity updated";
+			} else {
+				const newCart = [
+					...prevCart,
+					{
+						productSlug,
+						quantity: 1,
+					},
+				];
+
+				updateCart(newCart);
+				return "Item added to cart";
+			}
+		} catch (error) {
+			console.error("Error adding to cart:", error);
+			throw new Error("Failed to add to cart");
+		}
+	});
+
+const removeFromCart = createServerFn({ method: "POST" })
+	.inputValidator(
+		z.object({
+			productSlug: z.string(),
+		}),
+	)
+	.handler(async (ctx) => {
+		try {
+			const { productSlug } = ctx.data;
+			const prevCart = await getCart();
+
+			const itemAlreadyExists = prevCart.find(
+				(item) => item.productSlug === productSlug,
+			);
+
+			if (!itemAlreadyExists) {
+				return "Item not found in cart";
+			}
+
+			const newCart = prevCart.filter(
+				(item) => item.productSlug !== productSlug,
+			);
+			updateCart(newCart);
+
+			return "Item removed from cart";
+		} catch (error) {
+			console.error("Error removing from cart:", error);
+			throw new Error("Failed to remove from cart");
+		}
+	});
+
 export {
 	getCategory,
 	getCategoryProductCount,
@@ -390,4 +633,10 @@ export {
 	getProductsForSubcategory,
 	getRelatedProducts,
 	getSubCategoryProductCount,
+	signIn,
+	signUp,
+	getCart,
+	detailedCart,
+	addToCart,
+	removeFromCart,
 };

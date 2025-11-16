@@ -4,6 +4,7 @@ import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
+import { AddToCartForm } from "@/components/add-to-cart-form";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
 
@@ -67,20 +68,18 @@ function RouteComponent() {
 					<img
 						loading="eager"
 						decoding="sync"
-						src={
-							currentProduct?.imageUrl ?? "/placeholder.svg"
-						}
+						src={currentProduct?.imageUrl ?? "/placeholder.svg"}
 						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
-						className="h-56 w-56 flex-shrink-0 border-2 md:h-64 md:w-64"
+						className="h-56 w-56 shrink-0 border-2 md:h-64 md:w-64"
 					/>
-					<p className="flex-grow text-base">{currentProduct?.description}</p>
+					<p className="grow text-base">{currentProduct?.description}</p>
 				</div>
 				<p className="text-xl font-bold">
 					${parseFloat(currentProduct?.price || "0").toFixed(2)}
 				</p>
-				{/* <AddToCartForm productSlug={currentProduct?.slug ?? ""} /> */}
+				<AddToCartForm productSlug={productData?.slug ?? ""} />
 			</div>
 			<div className="pt-8">
 				{related.length > 0 && (
