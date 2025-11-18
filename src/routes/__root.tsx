@@ -70,7 +70,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				className={`flex flex-col overflow-y-auto overflow-x-hidden antialiased`}
 			>
 				<div>
-					<header className="fixed top-0 z-10 flex h-[90px] w-screen grow items-center justify-between border-b-2 border-accent2 bg-background p-2 pb-1 pt-2 sm:h-[70px] sm:flex-row sm:gap-4 sm:p-4 sm:pb-[4px] sm:pt-0">
+					<header className="fixed top-0 z-10 flex h-[90px] w-screen grow items-center justify-between border-b-2 border-accent2 bg-background p-2 pb-1 pt-2 sm:h-[70px] sm:flex-row sm:gap-4 sm:p-4 sm:pb-1 sm:pt-0">
 						<div className="flex grow flex-col">
 							<div className="absolute right-2 top-2 flex justify-end pt-2 font-sans text-sm hover:underline sm:relative sm:right-0 sm:top-0"></div>
 							<div className="flex w-full flex-col items-start justify-center sm:w-auto sm:flex-row sm:items-center sm:gap-2">
