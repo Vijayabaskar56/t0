@@ -1,19 +1,5 @@
-"use client";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/db/schema";
-
-// export function getProductLinkImageProps(
-//   imageUrl: string,
-//   productName: string,
-// ) {
-//   return getImageProps({
-//     width: 48,
-//     height: 48,
-//     quality: 65,
-//     src: imageUrl,
-//     alt: `A small picture of ${productName}`,
-//   });
-// }
 
 export function ProductLink(props: {
 	imageUrl?: string | null;
@@ -39,7 +25,8 @@ export function ProductLink(props: {
 				<img
 					loading={props.loading}
 					decoding="sync"
-					src={imageUrl ?? "/placeholder.svg?height=48&width=48"}
+					src={imageUrl ?? "/placeholder.jpeg?height=48&width=48"}
+					// biome-ignore lint/a11y/noRedundantAlt: <explanation>
 					alt={`A small picture of ${product.name}`}
 					width={48}
 					height={48}

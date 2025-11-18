@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import type { Product } from "@/db/schema";
 import {
 	getCategory,
 	getCategoryProductCount,
@@ -97,4 +98,13 @@ export const getProductCountOptions = () =>
 	queryOptions({
 		queryKey: ["product-count"],
 		queryFn: () => getProductCount(),
+	});
+
+export const getCartOptions = () =>
+	queryOptions({
+		queryKey: ["cart-items"],
+		queryFn: () =>
+			fetch("/order").then((res) => res.json()) as Promise<{
+				products: (Product & { quantity: number })[];
+			}>,
 	});

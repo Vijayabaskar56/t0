@@ -1,5 +1,3 @@
-"use client";
-
 import { useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -151,7 +149,7 @@ export function SearchDropdownComponent() {
 											<img
 												loading="eager"
 												decoding="sync"
-												src={item.image_url ?? "/placeholder.svg"}
+												src={item.imageUrl ?? "/placeholder.jpeg"}
 												alt=""
 												className="h-10 w-10 pr-2"
 												height={40}

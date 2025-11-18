@@ -1,6 +1,7 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getCollectionDetailsOptions } from "@/api/query-options";
-import { seo } from "@/lib/seo";
+import type { Category, Collection } from "@/db/schema";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
 	loader: async ({ params, context }) => {
@@ -8,7 +9,7 @@ export const Route = createFileRoute("/_layout/$collectionName")({
 			getCollectionDetailsOptions(params.collectionName),
 		);
 	},
-	head: ({ loaderData }) => ({
+	head: () => ({
 		meta: [
 			{
 				charSet: "utf-8",
@@ -21,7 +22,6 @@ export const Route = createFileRoute("/_layout/$collectionName")({
 				title: "TanStack Start Starter",
 			},
 		],
-		// ...seo({ title: loaderData?.[0]?.name }),
 	}),
 	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
@@ -29,10 +29,18 @@ export const Route = createFileRoute("/_layout/$collectionName")({
 });
 
 function RouteComponent() {
-	const collectionDetails = Route.useLoaderData();
-	if (!collectionDetails || collectionDetails.length === 0) return null;
+	const { collectionName } = Route.useParams();
+	const { data: collectionDetails } = useSuspenseQuery(
+		getCollectionDetailsOptions(collectionName),
+	);
 
-	const collection = collectionDetails[0];
+	const collections = collectionDetails as unknown as (Collection & {
+		categories: Category[];
+	})[];
+	if (!collections || collections.length === 0)
+		return <div>No collection found</div>;
+
+	const collection = collections[0];
 	return (
 		<div className="w-full p-4">
 			<div key={collection.name}>
@@ -50,7 +58,7 @@ function RouteComponent() {
 						>
 							<img
 								decoding="sync"
-								src={category.imageUrl ?? "/placeholder.svg"}
+								src={category.imageUrl ?? "/placeholder.jpeg"}
 								alt={`${category.name}`}
 								className="mb-2 h-14 w-14 border hover:bg-accent2"
 								width={48}
