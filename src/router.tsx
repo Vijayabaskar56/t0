@@ -1,5 +1,6 @@
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { ErrorBoundary } from "./components/error-boundary";
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
 
 // Import the generated route tree
@@ -16,6 +17,10 @@ export const getRouter = () => {
 		scrollRestoration: true,
 		defaultStructuralSharing: true,
 		scrollRestorationBehavior: "smooth",
+		defaultNotFoundComponent: () => <div>Not Found</div>,
+		defaultErrorComponent: ({ error, reset }) => (
+			<ErrorBoundary error={error} reset={reset} />
+		),
 		Wrap: (props: { children: React.ReactNode }) => {
 			return (
 				<TanstackQuery.Provider {...rqContext}>

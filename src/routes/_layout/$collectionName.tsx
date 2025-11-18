@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getCollectionDetailsOptions } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import type { Category, Collection } from "@/db/schema";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
@@ -24,8 +25,6 @@ export const Route = createFileRoute("/_layout/$collectionName")({
 		],
 	}),
 	component: RouteComponent,
-	pendingComponent: () => <div>Loading...</div>,
-	errorComponent: () => <div>Error</div>,
 });
 
 function RouteComponent() {
@@ -41,6 +40,7 @@ function RouteComponent() {
 		return <div>No collection found</div>;
 
 	const collection = collections[0];
+	let imageCount = 0;
 	return (
 		<div className="w-full p-4">
 			<div key={collection.name}>
@@ -56,13 +56,15 @@ function RouteComponent() {
 								category: category.slug,
 							}}
 						>
-							<img
+							<Image
+								loading={imageCount++ < 15 ? "eager" : "lazy"}
 								decoding="sync"
 								src={category.imageUrl ?? "/placeholder.jpeg"}
 								alt={`${category.name}`}
 								className="mb-2 h-14 w-14 border hover:bg-accent2"
 								width={48}
 								height={48}
+								quality={65}
 							/>
 							<span className="text-xs">{category.name}</span>
 						</Link>

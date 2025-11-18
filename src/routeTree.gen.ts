@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
-import { Route as ScanIndexRouteImport } from './routes/scan/index'
 import { Route as OrderIndexRouteImport } from './routes/order/index'
 import { Route as OrderHistoryIndexRouteImport } from './routes/order-history/index'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
@@ -21,11 +20,6 @@ import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './
 
 const LayoutRouteRoute = LayoutRouteRouteImport.update({
   id: '/_layout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScanIndexRoute = ScanIndexRouteImport.update({
-  id: '/scan/',
-  path: '/scan/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderIndexRoute = OrderIndexRouteImport.update({
@@ -72,7 +66,6 @@ export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
-  '/scan': typeof ScanIndexRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -82,7 +75,6 @@ export interface FileRoutesByTo {
   '/': typeof LayoutIndexRoute
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
-  '/scan': typeof ScanIndexRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -94,7 +86,6 @@ export interface FileRoutesById {
   '/_layout/': typeof LayoutIndexRoute
   '/order-history/': typeof OrderHistoryIndexRoute
   '/order/': typeof OrderIndexRoute
-  '/scan/': typeof ScanIndexRoute
   '/_layout/products/$category/': typeof LayoutProductsCategoryIndexRoute
   '/_layout/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/_layout/products/$category/$subcategory/': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -106,7 +97,6 @@ export interface FileRouteTypes {
     | '/'
     | '/order-history'
     | '/order'
-    | '/scan'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -116,7 +106,6 @@ export interface FileRouteTypes {
     | '/'
     | '/order-history'
     | '/order'
-    | '/scan'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -127,7 +116,6 @@ export interface FileRouteTypes {
     | '/_layout/'
     | '/order-history/'
     | '/order/'
-    | '/scan/'
     | '/_layout/products/$category/'
     | '/_layout/products/$category/$subcategory/$product'
     | '/_layout/products/$category/$subcategory/'
@@ -137,7 +125,6 @@ export interface RootRouteChildren {
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
   OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
   OrderIndexRoute: typeof OrderIndexRoute
-  ScanIndexRoute: typeof ScanIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -147,13 +134,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof LayoutRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/scan/': {
-      id: '/scan/'
-      path: '/scan'
-      fullPath: '/scan'
-      preLoaderRoute: typeof ScanIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order/': {
@@ -234,7 +214,6 @@ const rootRouteChildren: RootRouteChildren = {
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
   OrderHistoryIndexRoute: OrderHistoryIndexRoute,
   OrderIndexRoute: OrderIndexRoute,
-  ScanIndexRoute: ScanIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

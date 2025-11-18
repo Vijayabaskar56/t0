@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/db/schema";
+import { Image } from "./image";
 
 export function ProductLink(props: {
 	imageUrl?: string | null;
@@ -7,6 +8,7 @@ export function ProductLink(props: {
 	subcategory_slug: string;
 	loading: "eager" | "lazy";
 	product: Product;
+	quality?: number;
 }) {
 	const { category_slug, subcategory_slug, product, imageUrl } = props;
 
@@ -22,19 +24,19 @@ export function ProductLink(props: {
 			}}
 		>
 			<div className="py-2">
-				<img
+				<Image
 					loading={props.loading}
 					decoding="sync"
-					src={imageUrl ?? "/placeholder.jpeg?height=48&width=48"}
-					// biome-ignore lint/a11y/noRedundantAlt: <explanation>
+					src={imageUrl ?? "/placeholder.jpeg"}
 					alt={`A small picture of ${product.name}`}
 					width={48}
 					height={48}
-					className="h-auto w-12 flex-shrink-0 object-cover"
+					quality={props.quality ?? 65}
+					className="h-auto w-12 shrink-0 object-cover"
 				/>
 			</div>
 			<div className="px-2" />
-			<div className="h-26 flex flex-grow flex-col items-start py-2">
+			<div className="h-26 flex grow flex-col items-start py-2">
 				<div className="text-sm font-medium text-gray-700 group-hover:underline">
 					{product.name}
 				</div>

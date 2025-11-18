@@ -5,6 +5,7 @@ import {
 } from "@/api/query-options";
 import type { Category, Collection } from "@/db/schema";
 import { seo } from "@/lib/seo";
+import { Image } from "@/components/ui/image";
 
 interface LayoutLoaderData {
 	collections: (Collection & { categories: Category[] })[];
@@ -66,14 +67,15 @@ function RouteComponent() {
 									to="/products/$category"
 									params={{ category: category.slug }}
 								>
-									<img
-									loading={imageCount++ < 15 ? "eager" : "lazy"}
-									decoding="sync"
-										src={category.imageUrl ?? "/placeholder.jpeg?height=48&width=48"}
+									<Image
+										loading={imageCount++ < 15 ? "eager" : "lazy"}
+										decoding="sync"
+										src={category.imageUrl ?? "/placeholder.jpeg"}
 										alt={`${category.name} category`}
 										className="mb-2 h-14 w-14 border hover:bg-accent2"
 										width={48}
 										height={48}
+										quality={65}
 									/>
 									<span className="text-xs">{category.name}</span>
 								</Link>
