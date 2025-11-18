@@ -35,7 +35,7 @@ ${error.stack || "No stack trace available"}
 
 `);
 		window.open(
-			`https://github.com/Vijayabaskar56/t0/issues/new?title=${title}&body=${body}`,
+			`https://github.com/Vijayabaskar56/tanstack-start-faster/issues/new?title=${title}&body=${body}`,
 			"_blank",
 		);
 	};
