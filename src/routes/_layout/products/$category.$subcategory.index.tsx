@@ -1,16 +1,22 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	getProductForSubcategoryOptions,
 	getSubCategoryProductCountOptions,
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
+import type { Product } from "@/db/schema";
 import { seo } from "@/lib/seo";
+
+interface ProductCountData {
+	count: number;
+}
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/",
 )({
 	loader: async ({ params, context }) => {
-		const [subcategory, subcategoryCount] = await Promise.all([
+		await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductForSubcategoryOptions(params.subcategory),
 			),
@@ -18,23 +24,23 @@ export const Route = createFileRoute(
 				getSubCategoryProductCountOptions(params.subcategory),
 			),
 		]);
-		return { products: subcategory, productCount: subcategoryCount };
 	},
- head: ({ loaderData , params }) => {
-   console.log(loaderData , 'loaderdata' , params)
-   return {
-      meta: [
-        {
-          charSet: "utf-8",
-        },
-        {
-          name: "viewport",
-          content: "width=device-width, initial-scale=1",
-        },
-      ...seo({ title : `${params.subcategory.slice(0, 1).toUpperCase() + params.subcategory.slice(1).toLowerCase().replaceAll('-', ' ')}` }),
-      ],
-    }
-  },
+	head: ({ params }) => {
+		return {
+			meta: [
+				{
+					charSet: "utf-8",
+				},
+				{
+					name: "viewport",
+					content: "width=device-width, initial-scale=1",
+				},
+				...seo({
+					title: `${params.subcategory.slice(0, 1).toUpperCase() + params.subcategory.slice(1).toLowerCase().replaceAll("-", " ")}`,
+				}),
+			],
+		};
+	},
 	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
@@ -42,8 +48,19 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
 	const { category, subcategory } = Route.useParams();
-	const { products, productCount } = Route.useLoaderData();
+
+	const { data: productsData } = useSuspenseQuery(
+		getProductForSubcategoryOptions(subcategory),
+	);
+	const { data: productCountData } = useSuspenseQuery(
+		getSubCategoryProductCountOptions(subcategory),
+	);
+
+	const products = productsData as unknown as Product[];
+	const productCount = productCountData as unknown as ProductCountData[];
+
 	const finalCount = productCount[0]?.count;
+
 	return (
 		<div className="container mx-auto p-4">
 			{finalCount > 0 ? (

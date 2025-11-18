@@ -1,10 +1,14 @@
-import { getCollectionsOptions } from "@/api/query-options";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { getCollectionsOptions } from "@/api/query-options";
+import type { Collection } from "@/db/schema";
 
 export const Route = createFileRoute("/_layout")({
-	component: RouteComponent,
-	loader: ({ context }) => context.queryClient.ensureQueryData(getCollectionsOptions()),
-	head: ({  }) => ({
+	loader: ({ context }) => {
+		// Pre-populate the cache with collections data
+		return context.queryClient.ensureQueryData(getCollectionsOptions());
+	},
+	head: () => ({
 		meta: [
 			{
 				charSet: "utf-8",
@@ -20,10 +24,12 @@ export const Route = createFileRoute("/_layout")({
 	}),
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
+	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const allCollections = Route.useLoaderData();
+	// Read the pre-loaded data from cache and subscribe to updates
+	const { data: allCollections } = useSuspenseQuery(getCollectionsOptions());
 	return (
 		<div className="flex grow font-mono">
 			<aside className="fixed left-0 hidden w-64 min-w-64 max-w-64 overflow-y-auto border-r p-4 md:block md:h-full">
@@ -31,7 +37,7 @@ function RouteComponent() {
 					Choose a Category
 				</h2>
 				<ul className="flex flex-col items-start justify-center">
-					{allCollections.map((collection: any) => (
+					{(allCollections as Collection[]).map((collection) => (
 						<li key={collection.slug} className="w-full">
 							<Link
 								to="/$collectionName"

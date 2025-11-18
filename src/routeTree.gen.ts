@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as ScanIndexRouteImport } from './routes/scan/index'
 import { Route as OrderIndexRouteImport } from './routes/order/index'
 import { Route as OrderHistoryIndexRouteImport } from './routes/order-history/index'
@@ -19,7 +19,7 @@ import { Route as LayoutProductsCategoryIndexRouteImport } from './routes/_layou
 import { Route as LayoutProductsCategorySubcategoryIndexRouteImport } from './routes/_layout/products/$category.$subcategory.index'
 import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './routes/_layout/products/$category.$subcategory.$product'
 
-const LayoutRoute = LayoutRouteImport.update({
+const LayoutRouteRoute = LayoutRouteRouteImport.update({
   id: '/_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -41,30 +41,30 @@ const OrderHistoryIndexRoute = OrderHistoryIndexRouteImport.update({
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LayoutRoute,
+  getParentRoute: () => LayoutRouteRoute,
 } as any)
 const LayoutCollectionNameRoute = LayoutCollectionNameRouteImport.update({
   id: '/$collectionName',
   path: '/$collectionName',
-  getParentRoute: () => LayoutRoute,
+  getParentRoute: () => LayoutRouteRoute,
 } as any)
 const LayoutProductsCategoryIndexRoute =
   LayoutProductsCategoryIndexRouteImport.update({
     id: '/products/$category/',
     path: '/products/$category/',
-    getParentRoute: () => LayoutRoute,
+    getParentRoute: () => LayoutRouteRoute,
   } as any)
 const LayoutProductsCategorySubcategoryIndexRoute =
   LayoutProductsCategorySubcategoryIndexRouteImport.update({
     id: '/products/$category/$subcategory/',
     path: '/products/$category/$subcategory/',
-    getParentRoute: () => LayoutRoute,
+    getParentRoute: () => LayoutRouteRoute,
   } as any)
 const LayoutProductsCategorySubcategoryProductRoute =
   LayoutProductsCategorySubcategoryProductRouteImport.update({
     id: '/products/$category/$subcategory/$product',
     path: '/products/$category/$subcategory/$product',
-    getParentRoute: () => LayoutRoute,
+    getParentRoute: () => LayoutRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -89,7 +89,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_layout': typeof LayoutRouteWithChildren
+  '/_layout': typeof LayoutRouteRouteWithChildren
   '/_layout/$collectionName': typeof LayoutCollectionNameRoute
   '/_layout/': typeof LayoutIndexRoute
   '/order-history/': typeof OrderHistoryIndexRoute
@@ -134,7 +134,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  LayoutRoute: typeof LayoutRouteWithChildren
+  LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
   OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
   OrderIndexRoute: typeof OrderIndexRoute
   ScanIndexRoute: typeof ScanIndexRoute
@@ -146,7 +146,7 @@ declare module '@tanstack/react-router' {
       id: '/_layout'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof LayoutRouteImport
+      preLoaderRoute: typeof LayoutRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scan/': {
@@ -175,40 +175,40 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexRouteImport
-      parentRoute: typeof LayoutRoute
+      parentRoute: typeof LayoutRouteRoute
     }
     '/_layout/$collectionName': {
       id: '/_layout/$collectionName'
       path: '/$collectionName'
       fullPath: '/$collectionName'
       preLoaderRoute: typeof LayoutCollectionNameRouteImport
-      parentRoute: typeof LayoutRoute
+      parentRoute: typeof LayoutRouteRoute
     }
     '/_layout/products/$category/': {
       id: '/_layout/products/$category/'
       path: '/products/$category'
       fullPath: '/products/$category'
       preLoaderRoute: typeof LayoutProductsCategoryIndexRouteImport
-      parentRoute: typeof LayoutRoute
+      parentRoute: typeof LayoutRouteRoute
     }
     '/_layout/products/$category/$subcategory/': {
       id: '/_layout/products/$category/$subcategory/'
       path: '/products/$category/$subcategory'
       fullPath: '/products/$category/$subcategory'
       preLoaderRoute: typeof LayoutProductsCategorySubcategoryIndexRouteImport
-      parentRoute: typeof LayoutRoute
+      parentRoute: typeof LayoutRouteRoute
     }
     '/_layout/products/$category/$subcategory/$product': {
       id: '/_layout/products/$category/$subcategory/$product'
       path: '/products/$category/$subcategory/$product'
       fullPath: '/products/$category/$subcategory/$product'
       preLoaderRoute: typeof LayoutProductsCategorySubcategoryProductRouteImport
-      parentRoute: typeof LayoutRoute
+      parentRoute: typeof LayoutRouteRoute
     }
   }
 }
 
-interface LayoutRouteChildren {
+interface LayoutRouteRouteChildren {
   LayoutCollectionNameRoute: typeof LayoutCollectionNameRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutProductsCategoryIndexRoute: typeof LayoutProductsCategoryIndexRoute
@@ -216,7 +216,7 @@ interface LayoutRouteChildren {
   LayoutProductsCategorySubcategoryIndexRoute: typeof LayoutProductsCategorySubcategoryIndexRoute
 }
 
-const LayoutRouteChildren: LayoutRouteChildren = {
+const LayoutRouteRouteChildren: LayoutRouteRouteChildren = {
   LayoutCollectionNameRoute: LayoutCollectionNameRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutProductsCategoryIndexRoute: LayoutProductsCategoryIndexRoute,
@@ -226,11 +226,12 @@ const LayoutRouteChildren: LayoutRouteChildren = {
     LayoutProductsCategorySubcategoryIndexRoute,
 }
 
-const LayoutRouteWithChildren =
-  LayoutRoute._addFileChildren(LayoutRouteChildren)
+const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
+  LayoutRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-  LayoutRoute: LayoutRouteWithChildren,
+  LayoutRouteRoute: LayoutRouteRouteWithChildren,
   OrderHistoryIndexRoute: OrderHistoryIndexRoute,
   OrderIndexRoute: OrderIndexRoute,
   ScanIndexRoute: ScanIndexRoute,

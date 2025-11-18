@@ -1,17 +1,18 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
-import { seo } from "@/lib/seo";
+import type { Product } from "@/db/schema";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/$product",
 )({
 	component: RouteComponent,
 	loader: async ({ params, context }) => {
-		const [productData, relatedUnshifted] = await Promise.all([
+		await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductDetailsOptions(params.product),
 			),
@@ -19,14 +20,8 @@ export const Route = createFileRoute(
 				getProductsForSubcategoryOptions(params.subcategory),
 			),
 		]);
-		return { productData, relatedUnshifted };
 	},
-	head: ({ loaderData }) => {
-		const productName = loaderData?.productData?.name;
-		const productDescription = loaderData?.productData?.description;
-		const productPrice = loaderData?.productData?.price;
-		const productImage = loaderData?.productData?.imageUrl;
-		console.log(productName, productDescription, productPrice, productImage ,'dd')
+	head: () => {
 		return {
 			meta: [
 				{
@@ -36,35 +31,6 @@ export const Route = createFileRoute(
 					name: "viewport",
 					content: "width=device-width, initial-scale=1",
 				},
-				{
-					name: "description",
-					content: productDescription?.substring(0, 160),
-				},
-				{
-					property: "og:title",
-					content: productName,
-				},
-				{
-					property: "og:description",
-					content: productDescription?.substring(0, 160),
-				},
-				{
-					property: "og:image",
-					content: productImage,
-				},
-				{
-					property: "og:type",
-					content: "product",
-				},
-				{
-					property: "product:price:amount",
-					content: productPrice,
-				},
-				{
-					property: "product:price:currency",
-					content: "USD",
-				},
-			...seo({ title: productName }),
 			],
 		};
 	},
@@ -72,38 +38,49 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
 	const { category, subcategory, product } = Route.useParams();
-	console.log(category, subcategory, product);
-	const { productData, relatedUnshifted } = Route.useLoaderData();
-	const currentProductIndex = relatedUnshifted.findIndex(
+
+	const { data: productData } = useSuspenseQuery(
+		getProductDetailsOptions(product),
+	);
+	const { data: relatedProductsData } = useSuspenseQuery(
+		getProductsForSubcategoryOptions(subcategory),
+	);
+
+	const currentProduct = productData as unknown as Product;
+	const relatedProducts = relatedProductsData as unknown as Product[];
+
+	const currentProductIndex = relatedProducts.findIndex(
 		(p) => p.slug === product,
 	);
 	const related = [
-		...relatedUnshifted.slice(currentProductIndex + 1),
-		...relatedUnshifted.slice(0, currentProductIndex),
-	];
-	console.log(related, "related");
+		...relatedProducts.slice(currentProductIndex + 1),
+		...relatedProducts.slice(0, currentProductIndex),
+	].filter((p) => p.slug !== product);
+
 	return (
 		<div className="container p-4">
 			<h1 className="border-t-2 pt-1 text-xl font-bold text-accent1">
-				{productData?.name}
+				{currentProduct?.name}
 			</h1>
 			<div className="flex flex-col gap-2">
 				<div className="flex flex-row gap-2">
 					<img
 						loading="eager"
 						decoding="sync"
-						src={productData?.imageUrl ?? "/placeholder.svg?height=64&width=64"}
-						alt={`${productData?.name}`}
+						src={
+							currentProduct?.imageUrl ?? "/placeholder.svg"
+						}
+						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
 						className="h-56 w-56 flex-shrink-0 border-2 md:h-64 md:w-64"
 					/>
-					<p className="flex-grow text-base">{productData?.description}</p>
+					<p className="flex-grow text-base">{currentProduct?.description}</p>
 				</div>
 				<p className="text-xl font-bold">
-					${parseFloat(productData?.price).toFixed(2)}
+					${parseFloat(currentProduct?.price || "0").toFixed(2)}
 				</p>
-				{/* <AddToCartForm productSlug={productData?.slug ?? ""} /> */}
+				{/* <AddToCartForm productSlug={currentProduct?.slug ?? ""} /> */}
 			</div>
 			<div className="pt-8">
 				{related.length > 0 && (

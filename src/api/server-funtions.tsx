@@ -86,13 +86,11 @@ const getCategory = createServerFn({ method: "GET" })
 	.handler(async (ctx) => {
 		try {
 			const { category } = ctx.data;
-			console.log(category, "category", ctx.data);
 			const cacheKey = `category-${category}`;
-			// const cacheHit = await ctx.context?.env.CACHE.get(cacheKey, "json");
-			// console.log(cacheHit , 'category')
-			// if (cacheHit && cacheHit !== null && cacheHit !== undefined) {
-			// 	return cacheHit;
-			// }
+			const cacheHit = await ctx.context?.env.CACHE.get(cacheKey, "json");
+			if (cacheHit && cacheHit !== null && cacheHit !== undefined) {
+				return cacheHit;
+			}
 
 			const data = await db.query.categories.findFirst({
 				where: (categories, { eq }) => eq(categories.slug, category),
@@ -104,7 +102,6 @@ const getCategory = createServerFn({ method: "GET" })
 					},
 				},
 			});
-			console.log(data, "data");
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
