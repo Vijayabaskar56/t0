@@ -21,6 +21,7 @@ A highly performant e-commerce template using TanStack and Cloudflare, inspired 
   - [recreating 'login' page](https://v0.dev/chat/tijwMFByNX9?b=b_XnRtduKn2oe)
 - Enhanced with TanStack Query for data fetching and state management
 - Integrated TanStack Router for type-safe navigation and preloading
+- Images are not Optimized due to cost constrains
 
 #### DATA
 
@@ -98,5 +99,5 @@ This project is inspired by and adapted from [NextFaster](https://github.com/eth
 
 The original NextFaster project demonstrated the incredible performance possible with Next.js 15 and Vercel's platform. This TanStack + Cloudflare version aims to showcase similar performance characteristics while leveraging the power of TanStack's ecosystem and Cloudflare's global edge network.
 
-**Original Project**: [NextFaster](https://github.com/ethanniser/next-faster)  
+**Original Project**: [NextFaster](https://github.com/ethanniser/NextFaster)  
 **Original Thread**: [Twitter/X](https://x.com/ethanniser/status/1848442738204643330)
