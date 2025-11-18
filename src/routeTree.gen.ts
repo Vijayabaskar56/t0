@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OrderRouteRouteImport } from './routes/order/route'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as OrderIndexRouteImport } from './routes/order/index'
@@ -19,6 +20,11 @@ import { Route as LayoutProductsCategoryIndexRouteImport } from './routes/_layou
 import { Route as LayoutProductsCategorySubcategoryIndexRouteImport } from './routes/_layout/products/$category.$subcategory.index'
 import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './routes/_layout/products/$category.$subcategory.$product'
 
+const OrderRouteRoute = OrderRouteRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutRouteRoute = LayoutRouteRouteImport.update({
   id: '/_layout',
   getParentRoute: () => rootRouteImport,
@@ -29,9 +35,9 @@ const SearchIndexRoute = SearchIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderIndexRoute = OrderIndexRouteImport.update({
-  id: '/order/',
-  path: '/order/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => OrderRouteRoute,
 } as any)
 const OrderHistoryIndexRoute = OrderHistoryIndexRouteImport.update({
   id: '/order-history/',
@@ -68,10 +74,11 @@ const LayoutProductsCategorySubcategoryProductRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/order': typeof OrderRouteRouteWithChildren
   '/$collectionName': typeof LayoutCollectionNameRoute
   '/': typeof LayoutIndexRoute
   '/order-history': typeof OrderHistoryIndexRoute
-  '/order': typeof OrderIndexRoute
+  '/order/': typeof OrderIndexRoute
   '/search': typeof SearchIndexRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_layout': typeof LayoutRouteRouteWithChildren
+  '/order': typeof OrderRouteRouteWithChildren
   '/_layout/$collectionName': typeof LayoutCollectionNameRoute
   '/_layout/': typeof LayoutIndexRoute
   '/order-history/': typeof OrderHistoryIndexRoute
@@ -102,10 +110,11 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/order'
     | '/$collectionName'
     | '/'
     | '/order-history'
-    | '/order'
+    | '/order/'
     | '/search'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_layout'
+    | '/order'
     | '/_layout/$collectionName'
     | '/_layout/'
     | '/order-history/'
@@ -135,13 +145,20 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
+  OrderRouteRoute: typeof OrderRouteRouteWithChildren
   OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
-  OrderIndexRoute: typeof OrderIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/order': {
+      id: '/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_layout': {
       id: '/_layout'
       path: ''
@@ -158,10 +175,10 @@ declare module '@tanstack/react-router' {
     }
     '/order/': {
       id: '/order/'
-      path: '/order'
-      fullPath: '/order'
+      path: '/'
+      fullPath: '/order/'
       preLoaderRoute: typeof OrderIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OrderRouteRoute
     }
     '/order-history/': {
       id: '/order-history/'
@@ -230,10 +247,22 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
   LayoutRouteRouteChildren,
 )
 
+interface OrderRouteRouteChildren {
+  OrderIndexRoute: typeof OrderIndexRoute
+}
+
+const OrderRouteRouteChildren: OrderRouteRouteChildren = {
+  OrderIndexRoute: OrderIndexRoute,
+}
+
+const OrderRouteRouteWithChildren = OrderRouteRoute._addFileChildren(
+  OrderRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
+  OrderRouteRoute: OrderRouteRouteWithChildren,
   OrderHistoryIndexRoute: OrderHistoryIndexRoute,
-  OrderIndexRoute: OrderIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
 }
 export const routeTree = rootRouteImport

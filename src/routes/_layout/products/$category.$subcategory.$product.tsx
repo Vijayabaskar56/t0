@@ -4,6 +4,7 @@ import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
+import { AddToCartForm } from "@/components/add-to-cart-form";
 import { Image } from "@/components/ui/image";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
@@ -68,9 +69,7 @@ function RouteComponent() {
 					<Image
 						loading="eager"
 						decoding="sync"
-						src={
-							currentProduct?.imageUrl ?? "/placeholder.jpeg"
-						}
+						src={currentProduct?.imageUrl ?? "/placeholder.jpeg"}
 						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
@@ -82,7 +81,7 @@ function RouteComponent() {
 				<p className="text-xl font-bold">
 					${parseFloat(currentProduct?.price || "0").toFixed(2)}
 				</p>
-				{/* <AddToCartForm productSlug={currentProduct?.slug ?? ""} /> */}
+				<AddToCartForm productSlug={currentProduct?.slug ?? ""} />
 			</div>
 			<div className="pt-8">
 				{related.length > 0 && (

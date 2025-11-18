@@ -240,7 +240,7 @@ function RouteComponent() {
 	}, [cart]);
 
 	return (
-		<div className="flex grid-cols-3 flex-col gap-8 pt-4 lg:grid">
+		<div className="flex mx-auto  grid-cols-3 flex-col gap-8 pt-4 lg:grid">
 			<div className="col-span-2">
 				<Suspense>
 					<CartItems
