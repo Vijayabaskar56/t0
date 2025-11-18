@@ -20,7 +20,7 @@ export function WelcomeToast() {
 						This demo is to highlight the speed a full-stack TanStack Start site
 						can achieve.{" "}
 						<a
-							href="https://github.com/TanStack/start"
+							href="https://github.com/Vijayabaskar56/tanstack-start-faster/"
 							className="font-semibold text-accent1 hover:underline"
 							target="_blank"
 							rel="noopener"
