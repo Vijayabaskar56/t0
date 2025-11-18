@@ -4,6 +4,7 @@ import {
 	getCategoryOptions,
 	getCategoryProductCountOptions,
 } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
 
 interface CategoryData extends Category {
@@ -37,8 +38,6 @@ export const Route = createFileRoute("/_layout/products/$category/")({
 			},
 		],
 	}),
-	pendingComponent: () => <div>Loading...</div>,
-	errorComponent: () => <div>Error</div>,
 });
 
 function RouteComponent() {
@@ -54,6 +53,7 @@ function RouteComponent() {
 
 	const finalCount = productCountTyped[0]?.count;
 
+	let imageCount = 0;
 	return (
 		<div className="container p-4">
 			{finalCount && (
@@ -80,13 +80,14 @@ function RouteComponent() {
 									}}
 								>
 									<div className="py-2">
-										<img
-											loading="eager"
+										<Image
+											loading={imageCount++ < 15 ? "eager" : "lazy"}
 											decoding="sync"
 											src={subcategory.imageUrl ?? "/placeholder.jpeg"}
 											alt={`${subcategory.name}`}
 											width={48}
 											height={48}
+											quality={65}
 											className="h-12 w-12 flex-shrink-0 object-cover"
 										/>
 									</div>

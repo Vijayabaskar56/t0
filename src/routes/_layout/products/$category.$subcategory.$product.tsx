@@ -4,6 +4,7 @@ import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
 
@@ -64,7 +65,7 @@ function RouteComponent() {
 			</h1>
 			<div className="flex flex-col gap-2">
 				<div className="flex flex-row gap-2">
-					<img
+					<Image
 						loading="eager"
 						decoding="sync"
 						src={
@@ -73,6 +74,7 @@ function RouteComponent() {
 						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
+						quality={80}
 						className="h-56 w-56 flex-shrink-0 border-2 md:h-64 md:w-64"
 					/>
 					<p className="flex-grow text-base">{currentProduct?.description}</p>

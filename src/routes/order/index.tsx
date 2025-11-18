@@ -5,6 +5,7 @@ import { getCookie, setResponseHeader } from "@tanstack/react-start/server";
 import { X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import z from "zod";
+import { Image } from "@/components/ui/image";
 import { db } from "@/db";
 import type { Product } from "@/db/schema";
 
@@ -343,13 +344,14 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 			>
 				<div className="flex flex-row space-x-2">
 					<div className="flex h-24 w-24 items-center justify-center bg-gray-100">
-						<img
+						<Image
 							loading="eager"
 							decoding="sync"
 							src={product.imageUrl ?? "/placeholder.jpeg"}
 							alt="Product"
 							width={256}
 							height={256}
+							quality={75}
 						/>
 					</div>
 					<div className="max-w-[100px] flex-grow sm:max-w-full">

@@ -22,8 +22,6 @@ export const Route = createFileRoute("/_layout")({
 			},
 		],
 	}),
-	pendingComponent: () => <div>Loading...</div>,
-	errorComponent: () => <div>Error</div>,
 	component: RouteComponent,
 });
 

@@ -1,3 +1,4 @@
+import "../styles.css"
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -13,7 +14,6 @@ import CartCount from "@/components/cart-count";
 import { WelcomeToast } from "@/components/welcome-toast";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
-import "../styles.css"
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -50,7 +50,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	}),
 	shellComponent: RootDocument,
 	preload: true,
-	notFoundComponent: () => <div>Not Found Component</div>,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {

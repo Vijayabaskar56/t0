@@ -2,6 +2,7 @@ import { useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ProductSearchResult } from "@/app/api/search/route";
+import { Image } from "@/components/ui/image";
 import { Input } from "@/components/ui/input";
 import { Link } from "@/components/ui/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -146,7 +147,7 @@ export function SearchDropdownComponent() {
 											role="option"
 											aria-selected={index === highlightedIndex}
 										>
-											<img
+											<Image
 												loading="eager"
 												decoding="sync"
 												src={item.imageUrl ?? "/placeholder.jpeg"}
@@ -154,6 +155,7 @@ export function SearchDropdownComponent() {
 												className="h-10 w-10 pr-2"
 												height={40}
 												width={40}
+												quality={70}
 											/>
 											<span className="text-sm">{item.name}</span>
 										</div>

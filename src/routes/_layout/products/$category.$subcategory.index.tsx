@@ -42,8 +42,6 @@ export const Route = createFileRoute(
 		};
 	},
 	component: RouteComponent,
-	pendingComponent: () => <div>Loading...</div>,
-	errorComponent: () => <div>Error</div>,
 });
 
 function RouteComponent() {
