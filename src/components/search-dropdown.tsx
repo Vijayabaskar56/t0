@@ -149,7 +149,7 @@ export function SearchDropdownComponent() {
 											<img
 												loading="eager"
 												decoding="sync"
-												src={item.imageUrl ?? "/placeholder.svg"}
+												src={item.imageUrl ?? "/placeholder.jpeg"}
 												alt=""
 												className="h-10 w-10 pr-2"
 												height={40}

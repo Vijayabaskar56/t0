@@ -58,7 +58,7 @@ function RouteComponent() {
 						>
 							<img
 								decoding="sync"
-								src={category.imageUrl ?? "/placeholder.svg"}
+								src={category.imageUrl ?? "/placeholder.jpeg"}
 								alt={`${category.name}`}
 								className="mb-2 h-14 w-14 border hover:bg-accent2"
 								width={48}

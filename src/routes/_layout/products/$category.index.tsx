@@ -83,7 +83,7 @@ function RouteComponent() {
 										<img
 											loading="eager"
 											decoding="sync"
-											src={subcategory.imageUrl ?? "/placeholder.svg"}
+											src={subcategory.imageUrl ?? "/placeholder.jpeg"}
 											alt={`${subcategory.name}`}
 											width={48}
 											height={48}

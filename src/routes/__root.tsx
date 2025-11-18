@@ -13,6 +13,7 @@ import CartCount from "@/components/cart-count";
 import { WelcomeToast } from "@/components/welcome-toast";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+import "../styles.css"
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -31,14 +32,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			...seo({}),
 		],
 		links: [
-			{
-				rel: "preconnect",
-				href: "https://github.com",
-			},
-			{
-				rel: "dns-prefetch",
-				href: "https://github.com",
-			},
 			{
 				rel: "preload",
 				href: "/tanstack-circle-logo.png",

@@ -346,7 +346,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 						<img
 							loading="eager"
 							decoding="sync"
-							src={product.imageUrl ?? "/placeholder.svg"}
+							src={product.imageUrl ?? "/placeholder.jpeg"}
 							alt="Product"
 							width={256}
 							height={256}
