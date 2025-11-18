@@ -622,6 +622,45 @@ const removeFromCart = createServerFn({ method: "POST" })
 		}
 	});
 
+const searchProducts = createServerFn({ method: "GET" })
+	.inputValidator(
+		z.object({
+			q: z.string().min(2),
+		}),
+	)
+	.handler(async (ctx) => {
+		try {
+			const { q } = ctx.data;
+			const cacheKey = `search-${q}`;
+			const cacheHit = await ctx.context?.env.CACHE.get(cacheKey, "json");
+			if (cacheHit && cacheHit !== null && cacheHit !== undefined) {
+				return cacheHit;
+			}
+
+			const data = await db.query.products.findMany({
+				where: (products, { like }) => like(products.name, `%${q}%`),
+				orderBy: (products, { asc }) => asc(products.name),
+			});
+
+			const results = data.map((product) => ({
+				...product,
+				href: `/products/${product.subcategorySlug}/${product.slug}`,
+			}));
+
+			if (results) {
+				ctx.context?.waitUntil(
+					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(results), {
+						expirationTtl: 7200,
+					}),
+				);
+			}
+			return results;
+		} catch (error) {
+			console.error("Error searching products:", error);
+			throw new Error("Failed to search products");
+		}
+	});
+
 export {
 	getCategory,
 	getCategoryProductCount,
@@ -639,4 +678,5 @@ export {
 	detailedCart,
 	addToCart,
 	removeFromCart,
+	searchProducts,
 };

@@ -14,6 +14,7 @@ import CartCount from "@/components/cart-count";
 import { WelcomeToast } from "@/components/welcome-toast";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+import { SearchDropdownComponent } from "@/components/search-dropdown";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -71,7 +72,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								</Link>
 								<div className="items flex w-full flex-row items-center justify-between gap-4">
 									<div className="mx-0 grow sm:mx-auto sm:grow-0">
-										{/* <SearchDropdownComponent /> */}
+										 <SearchDropdownComponent />
 									</div>
 									<div className="flex flex-row justify-between space-x-4">
 										<div className="relative">

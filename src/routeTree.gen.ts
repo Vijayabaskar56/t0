@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteRouteImport } from './routes/_layout/route'
+import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as OrderIndexRouteImport } from './routes/order/index'
 import { Route as OrderHistoryIndexRouteImport } from './routes/order-history/index'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
@@ -20,6 +21,11 @@ import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './
 
 const LayoutRouteRoute = LayoutRouteRouteImport.update({
   id: '/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchIndexRoute = SearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderIndexRoute = OrderIndexRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
+  '/search': typeof SearchIndexRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/': typeof LayoutIndexRoute
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
+  '/search': typeof SearchIndexRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_layout/': typeof LayoutIndexRoute
   '/order-history/': typeof OrderHistoryIndexRoute
   '/order/': typeof OrderIndexRoute
+  '/search/': typeof SearchIndexRoute
   '/_layout/products/$category/': typeof LayoutProductsCategoryIndexRoute
   '/_layout/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/_layout/products/$category/$subcategory/': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/order-history'
     | '/order'
+    | '/search'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/order-history'
     | '/order'
+    | '/search'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/_layout/'
     | '/order-history/'
     | '/order/'
+    | '/search/'
     | '/_layout/products/$category/'
     | '/_layout/products/$category/$subcategory/$product'
     | '/_layout/products/$category/$subcategory/'
@@ -125,6 +137,7 @@ export interface RootRouteChildren {
   LayoutRouteRoute: typeof LayoutRouteRouteWithChildren
   OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
   OrderIndexRoute: typeof OrderIndexRoute
+  SearchIndexRoute: typeof SearchIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +147,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof LayoutRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/': {
+      id: '/search/'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order/': {
@@ -214,6 +234,7 @@ const rootRouteChildren: RootRouteChildren = {
   LayoutRouteRoute: LayoutRouteRouteWithChildren,
   OrderHistoryIndexRoute: OrderHistoryIndexRoute,
   OrderIndexRoute: OrderIndexRoute,
+  SearchIndexRoute: SearchIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

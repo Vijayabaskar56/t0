@@ -45,7 +45,6 @@ const config = defineConfig({
         },
       },
     },
-    cssCodeSplit: true,
   },
 })
 

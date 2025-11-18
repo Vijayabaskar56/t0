@@ -11,6 +11,7 @@ import {
 	getProductsForSubcategory,
 	getRelatedProducts,
 	getSubCategoryProductCount,
+	searchProducts,
 } from "./server-funtions";
 
 export const getCollectionsOptions = () =>
@@ -107,4 +108,14 @@ export const getCartOptions = () =>
 			fetch("/order").then((res) => res.json()) as Promise<{
 				products: (Product & { quantity: number })[];
 			}>,
+	});
+
+export const searchProductsOptions = (q: string) =>
+	queryOptions({
+		queryKey: ["search-products", q],
+		queryFn: () =>
+			searchProducts({
+				data: { q },
+			}),
+		enabled: q.length >= 2,
 	});

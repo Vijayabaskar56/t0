@@ -1,10 +1,9 @@
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, useParams, Link } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { ProductSearchResult } from "@/app/api/search/route";
+import { useQuery } from "@tanstack/react-query";
 import { Image } from "@/components/ui/image";
 import { Input } from "@/components/ui/input";
-import { Link } from "@/components/ui/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { Product } from "../db/schema";
@@ -13,40 +12,44 @@ type SearchResult = Product & { href: string };
 
 export function SearchDropdownComponent() {
 	const [searchTerm, setSearchTerm] = useState("");
-	const [filteredItems, setFilteredItems] = useState<SearchResult[]>([]);
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
 	const [highlightedIndex, setHighlightedIndex] = useState(-1);
-	const [isLoading, setIsLoading] = useState(false);
 
 	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
-	// we don't need react query, we have react query at home
-	// react query at home:
+	// Debounce search term by 200ms
 	useEffect(() => {
-		if (searchTerm.length === 0) {
-			setFilteredItems([]);
-		} else {
-			setIsLoading(true);
+		const timer = setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm);
+		}, 100);
 
-			const searchedFor = searchTerm;
-			fetch(`/api/search?q=${searchTerm}`).then(async (results) => {
-				const currentSearchTerm = inputRef.current?.value;
-				if (currentSearchTerm !== searchedFor) {
-					return;
-				}
-				const json = await results.json();
-				setIsLoading(false);
-				setFilteredItems(json as ProductSearchResult);
-			});
-		}
-	}, [searchTerm, inputRef]);
+		return () => clearTimeout(timer);
+	}, [searchTerm]);
 
-	const params = useParams();
+	// Search products using TanStack Query
+	const { data, isLoading } = useQuery<SearchResult[]>({
+		queryKey: ["search-products", debouncedSearchTerm],
+		queryFn: () =>
+			fetch(`/search?q=${encodeURIComponent(debouncedSearchTerm)}`).then(
+				(res) => res.json(),
+			),
+		enabled: debouncedSearchTerm.length >= 2,
+	});
+
+	const filteredItems = (data ?? []) as SearchResult[];
+
+	const params = useParams({ strict: false }) as {
+		product?: string;
+		subcategory?: string;
+	};
 	useEffect(() => {
-		if (!params.product) {
-			const subcategory = params.subcategory;
+		const product = params?.product;
+		const subcategory = params?.subcategory;
+
+		if (!product && subcategory) {
 			setSearchTerm(
 				typeof subcategory === "string" ? subcategory.replaceAll("-", " ") : "",
 			);
@@ -63,7 +66,7 @@ export function SearchDropdownComponent() {
 				prevIndex > 0 ? prevIndex - 1 : filteredItems.length - 1,
 			);
 		} else if (e.key === "Enter" && highlightedIndex >= 0) {
-			router.push(filteredItems[highlightedIndex].href);
+			router.navigate({ to: filteredItems[highlightedIndex].href });
 			setSearchTerm(filteredItems[highlightedIndex].name);
 			setIsOpen(false);
 			inputRef.current?.blur();
@@ -90,7 +93,7 @@ export function SearchDropdownComponent() {
 
 	return (
 		<div className="font-sans" ref={dropdownRef}>
-			<div className="relative flex-grow">
+			<div className="relative grow">
 				<div className="relative">
 					<Input
 						ref={inputRef}
@@ -125,7 +128,7 @@ export function SearchDropdownComponent() {
 						<ScrollArea className="h-[300px]">
 							{filteredItems.length > 0 ? (
 								filteredItems.map((item, index) => (
-									<Link href={item.href} key={item.slug} prefetch={true}>
+									<Link to={item.href} key={item.slug} preload={'intent'}>
 										<div
 											className={cn("flex cursor-pointer items-center p-2", {
 												"bg-gray-100": index === highlightedIndex,
