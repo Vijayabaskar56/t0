@@ -21,7 +21,7 @@ A highly performant e-commerce template using TanStack and Cloudflare, inspired 
   - [recreating 'login' page](https://v0.dev/chat/tijwMFByNX9?b=b_XnRtduKn2oe)
 - Enhanced with TanStack Query for data fetching and state management
 - Integrated TanStack Router for type-safe navigation and preloading
-- Images are not Optimized due to cost constrains
+- Images are not Done by Cloudflare Image Transformation
 
 #### DATA
 
@@ -55,7 +55,11 @@ This TanStack + Cloudflare version leverages:
 - **Cloudflare D1** for serverless SQL at the edge
 - **Cloudflare R2** for fast image delivery globally
 
-*Performance metrics will be added after deployment and testing.*
+
+[PageSpeed Report](https://pagespeed.web.dev/analysis/https-tanstack-faster-tancn-dev/ow16tkqgos?form_factor=desktop)
+
+<img width="822" alt="SCR-20241027-dmsb" src="https://raw.githubusercontent.com/Vijayabaskar56/tanstack-start-faster/refs/heads/main/public/light-house.png">
+
 
 ### Costs
 
