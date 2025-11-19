@@ -23,11 +23,10 @@ export function WelcomeToast() {
 							href="https://github.com/Vijayabaskar56/tanstack-start-faster/"
 							className="font-semibold text-accent1 hover:underline"
 							target="_blank"
-							rel="noopener"
+							rel="noopener noreferrer"
 						>
 							Get the Source
-						</>
-						.
+						</a>
 					</>
 				),
 			});
