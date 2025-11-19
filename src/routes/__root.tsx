@@ -68,7 +68,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 									width={40}
 								/>
 								<Link to="/" className="text-2xl font-bold text-accent1">
-									TanStackStart Faster
+									TanStack Start Faster
 								</Link>
 								<div className="items flex w-full flex-row items-center justify-between gap-4">
 									<div className="mx-0 grow sm:mx-auto sm:grow-0">
