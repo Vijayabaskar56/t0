@@ -11,6 +11,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
 import CartCount from "@/components/cart-count";
+import { Image } from "@/components/ui/image";
 import { WelcomeToast } from "@/components/welcome-toast";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
@@ -60,6 +61,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						<div className="flex grow flex-col">
 							<div className="absolute right-2 top-2 flex justify-end pt-2 font-sans text-sm hover:underline sm:relative sm:right-0 sm:top-0"></div>
 							<div className="flex w-full flex-col items-start justify-center sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+								<Image
+									src="/logo-black.svg"
+									alt="logo"
+									height={40}
+									width={40}
+								/>
 								<Link to="/" className="text-2xl font-bold text-accent1">
 									TanStackStart Faster
 								</Link>
