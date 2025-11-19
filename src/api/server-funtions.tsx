@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
 import { count, eq } from "drizzle-orm";
 import z from "zod";
 import { db } from "@/db";
@@ -10,7 +11,19 @@ import {
 	subcollections,
 	users,
 } from "@/db/schema";
-import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
+import type { RequestContext } from "@/server";
+
+// Helper function to check rate limit
+async function checkRateLimit(
+	ctx: {
+		context: RequestContext;
+	},
+	limiterName: "API_LIMITER" | "CART_WRITE_LIMITER",
+) {
+	const ip = getRequest().headers.get("cf-connecting-ip") || "unknown";
+	const { success } = await ctx.context.env[limiterName].limit({ key: ip });
+	return success;
+}
 
 const authSchema = z.object({
 	username: z.string().min(1),
@@ -102,6 +115,11 @@ const signIn = createServerFn({ method: "POST" })
 const getCollections = createServerFn({ method: "GET" }).handler(
 	async (ctx) => {
 		try {
+			// Rate limiting
+			if (!(await checkRateLimit(ctx, "API_LIMITER"))) {
+				throw new Error("Rate limit exceeded. Try again later.");
+			}
+
 			const cacheHit = await ctx.context?.env.CACHE.get("collections", "json");
 			if (cacheHit && cacheHit !== null && cacheHit !== undefined) {
 				return cacheHit;
@@ -486,10 +504,11 @@ function updateCart(newItems: CartItem[]) {
 	setResponseHeader("Set-Cookie", cookieOptions);
 }
 
-const getCart = createServerFn({ method: "GET" }).handler(async (ctx) => {
+const getCart = createServerFn({ method: "GET" }).handler(async () => {
 	try {
 		// Get cart cookie from request headers
-		const cartCookie = getRequest().headers.get("cookie")
+		const cartCookie = getRequest()
+			.headers.get("cookie")
 			?.match(/cart=([^;]+)/)?.[1];
 
 		if (!cartCookie) {
@@ -508,7 +527,7 @@ const getCart = createServerFn({ method: "GET" }).handler(async (ctx) => {
 	}
 });
 
-const detailedCart = createServerFn({ method: "GET" }).handler(async (ctx) => {
+const detailedCart = createServerFn({ method: "GET" }).handler(async () => {
 	try {
 		const cart = await getCart();
 
@@ -552,6 +571,11 @@ const addToCart = createServerFn({ method: "POST" })
 	)
 	.handler(async (ctx) => {
 		try {
+			// Rate limiting for writes
+			if (!(await checkRateLimit(ctx, "CART_WRITE_LIMITER"))) {
+				throw new Error("Rate limit exceeded. Try again later.");
+			}
+
 			const { productSlug } = ctx.data;
 			const prevCart = await getCart();
 
@@ -599,6 +623,11 @@ const removeFromCart = createServerFn({ method: "POST" })
 	)
 	.handler(async (ctx) => {
 		try {
+			// Rate limiting for writes
+			if (!(await checkRateLimit(ctx, "CART_WRITE_LIMITER"))) {
+				throw new Error("Rate limit exceeded. Try again later.");
+			}
+
 			const { productSlug } = ctx.data;
 			const prevCart = await getCart();
 
@@ -630,6 +659,11 @@ const searchProducts = createServerFn({ method: "GET" })
 	)
 	.handler(async (ctx) => {
 		try {
+			// Rate limiting
+			if (!(await checkRateLimit(ctx, "API_LIMITER"))) {
+				throw new Error("Rate limit exceeded. Try again later.");
+			}
+
 			const { q } = ctx.data;
 			const cacheKey = `search-${q}`;
 			const cacheHit = await ctx.context?.env.CACHE.get(cacheKey, "json");

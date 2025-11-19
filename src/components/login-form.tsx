@@ -1,13 +1,12 @@
-"use client";
+import { useActionState, useId } from "react";
+import { signIn, signUp } from "@/api/server-funtions";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { signIn, signUp,  } from "@/api/server-funtions";
-import { useActionState } from "react";
-import { Button } from "@/components/ui/button";
 
 export function LoginForm() {
 	const [signInState, signInFormAction, signInPending] = useActionState<
@@ -26,7 +25,7 @@ export function LoginForm() {
 			<div className="flex flex-col gap-4">
 				<div className="mt-1">
 					<Input
-						id="username"
+						id={useId()}
 						name="username"
 						aria-label="Username"
 						type="text"
@@ -43,7 +42,7 @@ export function LoginForm() {
 				<div>
 					<div className="mt-1">
 						<Input
-							id="password"
+							id={useId()}
 							name="password"
 							aria-label="Password"
 							type="password"
@@ -67,7 +66,7 @@ export function LoginForm() {
 				<Button
 					type="submit"
 					variant={"ghost"}
-					className="rounded-[2px] border-[1px] border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
+					className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
 					disabled={pending}
 					formAction={signUpFormAction}
 				>
@@ -86,7 +85,7 @@ export function SignInSignUp() {
 		<Popover>
 			<PopoverTrigger className="flex flex-row items-center gap-1">
 				Log in{" "}
-				<svg viewBox="0 0 10 6" className="h-[6px] w-[10px]">
+				<svg viewBox="0 0 10 6" className="h-1.5 w-2.5" aria-hidden="true">
 					<polygon points="0,0 5,6 10,0"></polygon>
 				</svg>
 			</PopoverTrigger>
@@ -103,7 +102,7 @@ export function SignOut(props: { username: string }) {
 		<Popover>
 			<PopoverTrigger className="flex flex-row items-center gap-1">
 				{props.username}{" "}
-				<svg viewBox="0 0 10 6" className="h-[6px] w-[10px]">
+				<svg viewBox="0 0 10 6" className="h-1.5 w-2.5" aria-hidden="true">
 					<polygon points="0,0 5,6 10,0"></polygon>
 				</svg>
 			</PopoverTrigger>
@@ -112,7 +111,7 @@ export function SignOut(props: { username: string }) {
 					<Button
 						// formAction={signOut}
 						variant={"ghost"}
-						className="rounded-[2px] border-[1px] border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
+						className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
 					>
 						{"Sign Out"}
 					</Button>

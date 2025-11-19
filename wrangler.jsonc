@@ -25,5 +25,31 @@
 		"bucket_name": "tanstack-faster-images",
 		"binding": "BUCKET",
 		"remote": true
-	}]
+	}],
+	"ratelimits": [
+		{
+			"name": "CART_READ_LIMITER",
+			"namespace_id": "1001",
+			"simple": {
+				"limit": 100,
+				"period": 60
+			}
+		},
+		{
+			"name": "CART_WRITE_LIMITER",
+			"namespace_id": "1002",
+			"simple": {
+				"limit": 50,
+				"period": 60
+			}
+		},
+		{
+			"name": "API_LIMITER",
+			"namespace_id": "1003",
+			"simple": {
+				"limit": 1000,
+				"period": 60
+			}
+		}
+	]
 }

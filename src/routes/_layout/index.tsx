@@ -3,9 +3,9 @@ import {
 	getCollectionsOptions,
 	getProductCountOptions,
 } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import type { Category, Collection } from "@/db/schema";
 import { seo } from "@/lib/seo";
-import { Image } from "@/components/ui/image";
 
 interface LayoutLoaderData {
 	collections: (Collection & { categories: Category[] })[];
@@ -61,7 +61,7 @@ function RouteComponent() {
 						<div className="flex flex-row flex-wrap justify-center gap-2 border-b-2 py-4 sm:justify-start">
 							{collection.categories.map((category: Category) => (
 								<Link
-									preload="intent"
+									preload="viewport"
 									key={category.name}
 									className="flex w-[125px] flex-col items-center text-center"
 									to="/products/$category"
@@ -70,7 +70,7 @@ function RouteComponent() {
 									<Image
 										loading={imageCount++ < 15 ? "eager" : "lazy"}
 										decoding="sync"
-										src={category.imageUrl ?? "/placeholder.jpeg"}
+										src={category.imageUrl ?? "/placeholder.webp"}
 										alt={`${category.name} category`}
 										className="mb-2 h-14 w-14 border hover:bg-accent2"
 										width={48}

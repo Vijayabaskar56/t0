@@ -1,7 +1,7 @@
-import { useRouter, useParams, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useParams, useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Image } from "@/components/ui/image";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,7 +10,7 @@ import type { Product } from "../db/schema";
 
 type SearchResult = Product & { href: string };
 
-export function SearchDropdownComponent() {
+export default function SearchDropdownComponent() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
@@ -89,7 +89,7 @@ export function SearchDropdownComponent() {
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [dropdownRef]);
+	}, []);
 
 	return (
 		<div className="font-sans" ref={dropdownRef}>
@@ -128,7 +128,7 @@ export function SearchDropdownComponent() {
 						<ScrollArea className="h-[300px]">
 							{filteredItems.length > 0 ? (
 								filteredItems.map((item, index) => (
-									<Link to={item.href} key={item.slug} preload={'intent'}>
+									<Link to={item.href} key={item.slug} preload={"intent"}>
 										<div
 											className={cn("flex cursor-pointer items-center p-2", {
 												"bg-gray-100": index === highlightedIndex,
@@ -153,7 +153,7 @@ export function SearchDropdownComponent() {
 											<Image
 												loading="eager"
 												decoding="sync"
-												src={item.imageUrl ?? "/placeholder.jpeg"}
+												src={item.imageUrl ?? "/placeholder.webp"}
 												alt=""
 												className="h-10 w-10 pr-2"
 												height={40}

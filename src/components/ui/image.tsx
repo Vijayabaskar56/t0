@@ -1,11 +1,13 @@
-import { type ImgHTMLAttributes } from "react";
+import type { ImgHTMLAttributes } from "react";
 
-interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, "srcSet"> {
+interface ImageProps
+	extends Omit<ImgHTMLAttributes<HTMLImageElement>, "srcSet"> {
 	src: string;
 	alt: string;
 	width: number;
 	height: number;
 	quality?: number;
+	blurDataURL?: string;
 }
 
 export function Image({
@@ -13,18 +15,20 @@ export function Image({
 	alt,
 	width,
 	height,
-	quality = 85,
+	quality = 60,
 	loading = "lazy",
 	decoding = "async",
 	className,
+	blurDataURL,
 	...props
 }: ImageProps) {
+	// Apply Cloudflare optimization only to R2 images
 	const isR2Image = src.includes("r2.dev");
 
 	const getOptimizedUrl = (w: number, q: number) => {
 		if (!isR2Image) return src;
-    return src;
-		// return `/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`; // might be too costly for me 😢
+		// Use Cloudflare Image Resizing for R2 images
+		return `/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`;
 	};
 
 	const srcSet = isR2Image
@@ -41,6 +45,15 @@ export function Image({
 			loading={loading}
 			decoding={decoding}
 			className={className}
+			style={
+				blurDataURL
+					? {
+							backgroundImage: `url(${blurDataURL})`,
+							backgroundSize: "cover",
+							...props.style,
+						}
+					: props.style
+			}
 			{...props}
 		/>
 	);

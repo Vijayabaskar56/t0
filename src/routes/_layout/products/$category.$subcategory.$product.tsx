@@ -69,14 +69,14 @@ function RouteComponent() {
 					<Image
 						loading="eager"
 						decoding="sync"
-						src={currentProduct?.imageUrl ?? "/placeholder.jpeg"}
+						src={currentProduct?.imageUrl ?? "/placeholder.webp"}
 						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
 						quality={80}
-						className="h-56 w-56 flex-shrink-0 border-2 md:h-64 md:w-64"
+						className="h-56 w-56 shrink-0 border-2 md:h-64 md:w-64"
 					/>
-					<p className="flex-grow text-base">{currentProduct?.description}</p>
+					<p className="grow text-base">{currentProduct?.description}</p>
 				</div>
 				<p className="text-xl font-bold">
 					${parseFloat(currentProduct?.price || "0").toFixed(2)}

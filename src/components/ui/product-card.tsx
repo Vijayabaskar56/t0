@@ -27,7 +27,7 @@ export function ProductLink(props: {
 				<Image
 					loading={props.loading}
 					decoding="sync"
-					src={imageUrl ?? "/placeholder.jpeg"}
+					src={imageUrl ?? "/placeholder.webp"}
 					alt={`A small picture of ${product.name}`}
 					width={48}
 					height={48}

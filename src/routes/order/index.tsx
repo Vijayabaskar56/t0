@@ -55,7 +55,18 @@ export const Route = createFileRoute("/order/")({
 		handlers: ({ createHandlers }) => {
 			return createHandlers({
 				GET: {
-					handler: async ({ context }) => {
+					handler: async ({ context, request }) => {
+						// Rate limiting
+						const ip = request.headers.get("cf-connecting-ip") || "unknown";
+						const { success } = await context.env.CART_READ_LIMITER.limit({
+							key: ip,
+						});
+						if (!success) {
+							return new Response("Rate limit exceeded. Try again later.", {
+								status: 429,
+							});
+						}
+
 						const cart = context.cart;
 						const products = await db.query.products.findMany({
 							where: (products, { inArray }) =>
@@ -85,6 +96,17 @@ export const Route = createFileRoute("/order/")({
 				},
 				POST: {
 					handler: async ({ context, request }) => {
+						// Rate limiting for writes
+						const ip = request.headers.get("cf-connecting-ip") || "unknown";
+						const { success } = await context.env.CART_WRITE_LIMITER.limit({
+							key: ip,
+						});
+						if (!success) {
+							return new Response("Rate limit exceeded. Try again later.", {
+								status: 429,
+							});
+						}
+
 						const prevCart = context.cart;
 						const { productSlug } = (await request.json()) as {
 							productSlug: string;
@@ -126,6 +148,17 @@ export const Route = createFileRoute("/order/")({
 				},
 				PUT: {
 					handler: async ({ context, request }) => {
+						// Rate limiting for writes
+						const ip = request.headers.get("cf-connecting-ip") || "unknown";
+						const { success } = await context.env.CART_WRITE_LIMITER.limit({
+							key: ip,
+						});
+						if (!success) {
+							return new Response("Rate limit exceeded. Try again later.", {
+								status: 429,
+							});
+						}
+
 						const prevCart = context.cart;
 						const { productSlug } = (await request.json()) as {
 							productSlug: string;
@@ -151,6 +184,17 @@ export const Route = createFileRoute("/order/")({
 				},
 				PATCH: {
 					handler: async ({ context, request }) => {
+						// Rate limiting for writes
+						const ip = request.headers.get("cf-connecting-ip") || "unknown";
+						const { success } = await context.env.CART_WRITE_LIMITER.limit({
+							key: ip,
+						});
+						if (!success) {
+							return new Response("Rate limit exceeded. Try again later.", {
+								status: 429,
+							});
+						}
+
 						const prevCart = context.cart;
 						const { productSlug, action } = (await request.json()) as {
 							productSlug: string;
@@ -240,8 +284,8 @@ function RouteComponent() {
 	}, [cart]);
 
 	return (
-		<div className="flex mx-auto  grid-cols-3 flex-col gap-8 pt-4 lg:grid">
-			<div className="col-span-2">
+		<div className="flex mx-auto flex-col gap-6 pt-4 lg:grid lg:grid-cols-3 lg:gap-8">
+			<div className="lg:col-span-2">
 				<Suspense>
 					<CartItems
 						cart={
@@ -252,9 +296,9 @@ function RouteComponent() {
 				</Suspense>
 			</div>
 
-			<div className="space-y-4">
+			<div className="space-y-4 lg:sticky lg:top-4 lg:h-fit">
 				<div className="rounded bg-gray-100 p-4">
-					<p className="font-semibold">
+					<p className="font-semibold text-lg">
 						Merchandise{" "}
 						<Suspense>
 							<span>${totalCost.toFixed(2)}</span>
@@ -281,8 +325,10 @@ export function CartItems({
 		<>
 			{cart.length > 0 && (
 				<div className="pb-4">
-					<p className="font-semibold text-accent1">Delivers in 2-4 weeks</p>
-					<p className="text-sm text-gray-500">Need this sooner?</p>
+					<p className="font-semibold text-accent1 text-sm sm:text-base">
+						Delivers in 2-4 weeks
+					</p>
+					<p className="text-xs sm:text-sm text-gray-500">Need this sooner?</p>
 				</div>
 			)}
 			{cart.length > 0 ? (
@@ -311,6 +357,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 			}).then((res) => res.json()),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["order-cart"] });
+			queryClient.invalidateQueries({ queryKey: ["cart-items"] });
 		},
 	});
 
@@ -328,11 +375,12 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 			}).then((res) => res.json()),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["order-cart"] });
+			queryClient.invalidateQueries({ queryKey: ["cart-items"] });
 		},
 	});
 
 	return (
-		<div className="flex flex-row items-center justify-between border-t border-gray-200 pt-4">
+		<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-gray-200 pt-4 gap-4">
 			<Link
 				preload="intent"
 				to="/products/$category/$subcategory/$product"
@@ -341,72 +389,78 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 					subcategory: product.subcategorySlug,
 					product: product.slug,
 				}}
+				className="flex-1"
 			>
-				<div className="flex flex-row space-x-2">
-					<div className="flex h-24 w-24 items-center justify-center bg-gray-100">
+				<div className="flex flex-row space-x-3 sm:space-x-4">
+					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 flex-shrink-0">
 						<Image
 							loading="eager"
 							decoding="sync"
-							src={product.imageUrl ?? "/placeholder.jpeg"}
+							src={product.imageUrl ?? "/placeholder.webp"}
 							alt="Product"
 							width={256}
 							height={256}
 							quality={75}
 						/>
 					</div>
-					<div className="max-w-[100px] flex-grow sm:max-w-full">
-						<h2 className="font-semibold">{product.name}</h2>
-						<p className="text-sm md:text-base">{product.description}</p>
+					<div className="flex-1 min-w-0">
+						<h2 className="font-semibold text-sm sm:text-base">
+							{product.name}
+						</h2>
+						<p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+							{product.description}
+						</p>
 					</div>
 				</div>
 			</Link>
-			<div className="flex items-center justify-center md:space-x-10">
-				<div className="flex flex-col-reverse md:flex-row md:gap-4">
-					<div className="flex items-center gap-2">
-						<button
-							type="button"
-							onClick={() =>
-								updateQuantity({
-									productSlug: product.slug,
-									action: "decrease",
-								})
-							}
-							disabled={product.quantity <= 1}
-							className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-						>
-							-
-						</button>
-						<span className="w-8 text-center">{product?.quantity ?? 0}</span>
-						<button
-							type="button"
-							onClick={() =>
-								updateQuantity({
-									productSlug: product.slug,
-									action: "increase",
-								})
-							}
-							className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center text-sm hover:bg-gray-100"
-						>
-							+
-						</button>
+			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+				<div className="flex items-center gap-2 order-2 sm:order-1">
+					<button
+						type="button"
+						onClick={() =>
+							updateQuantity({
+								productSlug: product.slug,
+								action: "decrease",
+							})
+						}
+						disabled={product.quantity <= 1}
+						className="w-7 h-7 sm:w-6 sm:h-6 rounded border border-gray-300 flex items-center justify-center text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+					>
+						-
+					</button>
+					<span className="w-8 text-center text-sm">
+						{product?.quantity ?? 0}
+					</span>
+					<button
+						type="button"
+						onClick={() =>
+							updateQuantity({
+								productSlug: product.slug,
+								action: "increase",
+							})
+						}
+						className="w-7 h-7 sm:w-6 sm:h-6 rounded border border-gray-300 flex items-center justify-center text-sm hover:bg-gray-100"
+					>
+						+
+					</button>
+				</div>
+				<div className="flex flex-col sm:flex-row gap-1 sm:gap-4 order-1 sm:order-2 text-sm">
+					<div className="text-gray-600">
+						<p>${Number(product.price).toFixed(2)} each</p>
 					</div>
-					<div className="flex md:block">
-						<div className="min-w-8 text-sm md:min-w-24 md:text-base">
-							<p>${Number(product.price).toFixed(2)} each</p>
-						</div>
-					</div>
-					<div className="min-w-24">
-						<p className="font-semibold">${cost}</p>
+					<div className="font-semibold">
+						<p>${cost}</p>
 					</div>
 				</div>
 				<form
 					action={() => {
 						removeItemFromCart(product.slug);
 					}}
+					className="order-3"
 				>
-					<button type="submit">
+					<button type="submit" className="p-1 hover:bg-gray-100 rounded">
 						<input type="hidden" name="productSlug" value={product.slug} />
-						<X className="h-6 w-6" />
+						<X className="h-5 w-5" />
 					</button>
 				</form>
 			</div>

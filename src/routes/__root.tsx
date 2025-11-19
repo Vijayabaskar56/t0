@@ -1,4 +1,4 @@
-import "../styles.css"
+import "../styles.css";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -8,13 +8,16 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
 import CartCount from "@/components/cart-count";
 import { WelcomeToast } from "@/components/welcome-toast";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
-import { SearchDropdownComponent } from "@/components/search-dropdown";
+
+const SearchDropdownComponent = lazy(
+	() => import("@/components/search-dropdown"),
+);
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -33,16 +36,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			...seo({}),
 		],
 		links: [
-			{
-				rel: "preload",
-				href: "/tanstack-circle-logo.png",
-				as: "image",
-			},
-			{
-				rel: "preload",
-				href: "/logo192.png",
-				as: "image",
-			},
 			{
 				rel: "icon",
 				href: "/favicon.ico",
@@ -72,7 +65,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								</Link>
 								<div className="items flex w-full flex-row items-center justify-between gap-4">
 									<div className="mx-0 grow sm:mx-auto sm:grow-0">
-										 <SearchDropdownComponent />
+										<Suspense
+											fallback={
+												<div className="h-10 w-full bg-gray-100 animate-pulse rounded" />
+											}
+										>
+											<SearchDropdownComponent />
+										</Suspense>
 									</div>
 									<div className="flex flex-row justify-between space-x-4">
 										<div className="relative">
@@ -129,18 +128,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						</a>
 					</div>
 				</footer>
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
+				{import.meta.env.DEV && (
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+							TanStackQueryDevtools,
+						]}
+					/>
+				)}
 				<Suspense fallback={null}>
 					<Toaster closeButton />
 					<WelcomeToast />

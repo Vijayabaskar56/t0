@@ -83,7 +83,7 @@ function RouteComponent() {
 										<Image
 											loading={imageCount++ < 15 ? "eager" : "lazy"}
 											decoding="sync"
-											src={subcategory.imageUrl ?? "/placeholder.jpeg"}
+											src={subcategory.imageUrl ?? "/placeholder.webp"}
 											alt={`${subcategory.name}`}
 											width={48}
 											height={48}
