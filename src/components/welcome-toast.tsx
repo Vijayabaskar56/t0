@@ -6,7 +6,7 @@ export function WelcomeToast() {
 		// ignore if screen height is too small
 		if (window.innerHeight < 850) return;
 		if (!document.cookie.includes("welcome-toast=3")) {
-			toast("🚀 Welcome to TanStack Start!", {
+			toast("🚀 Welcome to TanStack Faster!", {
 				id: "welcome-toast",
 				duration: Infinity,
 				onDismiss: () => {
