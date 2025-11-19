@@ -18,7 +18,7 @@ export const seo = ({
 	twitterCreator?: string;
 }) => {
 	const tags = [
-		{ title : `${title ?? 'TanstackStart Faster'} | TanstackStart Faster` },
+		{ title: `${title ?? "TanstackStart Faster"} | TanstackStart Faster` },
 		{ name: "description", content: description },
 		{ name: "keywords", content: keywords },
 		{ name: "twitter:title", content: title },

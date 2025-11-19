@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { sql, or } from "drizzle-orm";
+import { or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
+	categories,
 	products,
 	subcategories,
 	subcollections,
-	categories,
 } from "@/db/schema";
 
 export const Route = createFileRoute("/search/")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/search/")({
 							return Response.json([]);
 						}
 
-						let data;
+						let data: any;
 
 						if (q.length <= 2) {
 							// Short search term: prefix matching
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/search/")({
 									category: categories,
 								})
 								.from(products)
-								.where(sql`${products.name} LIKE ${q + "%"} COLLATE NOCASE`)
+								.where(sql`${products.name} LIKE ${`${q}%`} COLLATE NOCASE`)
 								.innerJoin(
 									subcategories,
 									sql`${products.subcategorySlug} = ${subcategories.slug}`,
@@ -56,8 +56,8 @@ export const Route = createFileRoute("/search/")({
 								.map((word) => `%${word}%`);
 
 							// Build OR conditions for each word
-							const conditions = searchWords.map((word) =>
-								sql`${products.name} LIKE ${word} COLLATE NOCASE`,
+							const conditions = searchWords.map(
+								(word) => sql`${products.name} LIKE ${word} COLLATE NOCASE`,
 							);
 
 							data = await db
