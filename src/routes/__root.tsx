@@ -114,19 +114,28 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<div className="pt-[85px] sm:pt-[70px]">{children}</div>
 				</div>
 				<footer className="fixed bottom-0 flex h-12 w-screen flex-col items-center justify-between space-y-2 border-t border-gray-400 bg-background px-4 font-sans text-[11px] sm:h-6 sm:flex-row sm:space-y-0">
-					<div className="flex flex-wrap justify-center space-x-2 pt-2 sm:justify-start">
-						<span className="hover:bg-accent2 hover:underline">Home</span>
-						<span>|</span>
-						<span className="hover:bg-accent2 hover:underline">FAQ</span>
-						<span>|</span>
-						<span className="hover:bg-accent2 hover:underline">Returns</span>
-						<span>|</span>
-						<span className="hover:bg-accent2 hover:underline">Careers</span>
-						<span>|</span>
-						<span className="hover:bg-accent2 hover:underline">Contact</span>
+					<div className="text-center sm:text-right">
+						Powered by{" "}
+						<a
+							href="https://tanstack.com/start/latest"
+							className="font-bold text-accent1 hover:underline"
+							target="_blank"
+							rel="noopener"
+						>
+							Tanstack Start
+						</a>{" "}
+						&{" "}
+						<a
+							href="https://tanstack.com/start/latest"
+							className="font-bold text-accent1 hover:underline"
+							target="_blank"
+							rel="noopener"
+						>
+							Cloudflare Workers
+						</a>
 					</div>
 					<div className="text-center sm:text-right">
-						By using this website, you agree to check out the{" "}
+						Check out the{" "}
 						<a
 							href="https://github.com/Vijayabaskar56/tanstack-start-faster"
 							className="font-bold text-accent1 hover:underline"

@@ -1,6 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+
+
 // Collections: ID-based primary key (auto-increment)
 export const collections = sqliteTable("collections", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -64,7 +66,10 @@ export const products = sqliteTable(
 			.references(() => subcategories.slug, { onDelete: "cascade" }),
 		imageUrl: text("image_url"),
 	},
-	(table) => [index("products_subcategory_slug_idx").on(table.subcategorySlug)],
+	(table) => [
+		index("products_subcategory_slug_idx").on(table.subcategorySlug),
+		index("products_name_idx").on(sql`name COLLATE NOCASE`),
+	],
 );
 
 // Users: ID-based primary key (auto-increment)
