@@ -125,7 +125,7 @@ const CustomLinkComponent = React.forwardRef<
 							}, console.error);
 						}
 						observer.unobserve(entry.target);
-					}, 150);
+					}, 300);
 				} else if (prefetchTimeoutRef.current) {
 					clearTimeout(prefetchTimeoutRef.current);
 					prefetchTimeoutRef.current = null;
