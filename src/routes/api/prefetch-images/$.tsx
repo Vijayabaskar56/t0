@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { parseHTML } from "linkedom";
 
 export const Route = createFileRoute("/api/prefetch-images/$")({
 	server: {
@@ -26,33 +27,18 @@ export const Route = createFileRoute("/api/prefetch-images/$")({
 
 							const html = await pageResponse.text();
 
-							// Simple HTML parsing to extract image information
-							// Using regex as a lightweight solution for Cloudflare Workers
-							const imgRegex = /<img[^>]+>/gi;
-							const imgMatches = html.match(imgRegex) || [];
-
-							const images = imgMatches
-								.map((imgTag) => {
-									const srcMatch = imgTag.match(/src=["']([^"']+)["']/i);
-									const srcsetMatch = imgTag.match(/srcset=["']([^"']+)["']/i);
-									const sizesMatch = imgTag.match(/sizes=["']([^"']+)["']/i);
-									const altMatch = imgTag.match(/alt=["']([^"']*)["']/i);
-									const loadingMatch = imgTag.match(
-										/loading=["']([^"']+)["']/i,
-									);
-
-									const src = srcMatch ? srcMatch[1] : null;
-									if (!src) return null;
-
-									return {
-										src,
-										srcset: srcsetMatch ? srcsetMatch[1] : null,
-										sizes: sizesMatch ? sizesMatch[1] : null,
-										alt: altMatch ? altMatch[1] : "",
-										loading: loadingMatch ? loadingMatch[1] : "auto",
-									};
-								})
-								.filter((img): img is NonNullable<typeof img> => img !== null);
+							// Parse HTML with DOM parser for efficient image extraction
+							const { document } = parseHTML(html);
+							const images = Array.from(document.querySelectorAll("main img"))
+								.map((img) => ({
+									srcset:
+										img.getAttribute("srcset") || img.getAttribute("srcSet"), // Linkedom is case-sensitive
+									sizes: img.getAttribute("sizes"),
+									src: img.getAttribute("src"),
+									alt: img.getAttribute("alt"),
+									loading: img.getAttribute("loading"),
+								}))
+								.filter((img) => img.src);
 
 							return Response.json(
 								{ images },

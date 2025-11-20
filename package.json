@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "drizzle-kit": "^0.30.0",
     "drizzle-orm": "^0.39.0",
+    "linkedom": "^0.18.12",
     "lucide-react": "^0.544.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
