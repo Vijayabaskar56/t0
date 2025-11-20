@@ -1,5 +1,6 @@
 import { createLink } from "@tanstack/react-router";
 import * as React from "react";
+import { getPrefetchImages } from "@/api/server-funtions";
 
 type PrefetchImage = {
 	srcset: string | null;
@@ -33,18 +34,18 @@ async function prefetchImages(href: string): Promise<PrefetchImage[]> {
 	try {
 		if (typeof window === "undefined") return [];
 		const url = new URL(href, window.location.href);
-		const imageResponse = await fetch(`/api/prefetch-images${url.pathname}`, {
-			priority: "low",
+		const imageResponse = await getPrefetchImages({
+			data: { path: `${url.pathname}` },
 		});
 
-		if (!imageResponse.ok) {
+		if (!imageResponse) {
 			if (import.meta.env.DEV) {
 				throw new Error("Failed to prefetch images");
 			}
 			return [];
 		}
 
-		const response = (await imageResponse.json()) as {
+		const response = imageResponse as {
 			images: PrefetchImage[];
 		};
 		const { images } = response;

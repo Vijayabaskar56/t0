@@ -16,7 +16,6 @@ import { Route as OrderIndexRouteImport } from './routes/order/index'
 import { Route as OrderHistoryIndexRouteImport } from './routes/order-history/index'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutCollectionNameRouteImport } from './routes/_layout/$collectionName'
-import { Route as ApiPrefetchImagesSplatRouteImport } from './routes/api/prefetch-images/$'
 import { Route as LayoutProductsCategoryIndexRouteImport } from './routes/_layout/products/$category.index'
 import { Route as LayoutProductsCategorySubcategoryIndexRouteImport } from './routes/_layout/products/$category.$subcategory.index'
 import { Route as LayoutProductsCategorySubcategoryProductRouteImport } from './routes/_layout/products/$category.$subcategory.$product'
@@ -55,11 +54,6 @@ const LayoutCollectionNameRoute = LayoutCollectionNameRouteImport.update({
   path: '/$collectionName',
   getParentRoute: () => LayoutRouteRoute,
 } as any)
-const ApiPrefetchImagesSplatRoute = ApiPrefetchImagesSplatRouteImport.update({
-  id: '/api/prefetch-images/$',
-  path: '/api/prefetch-images/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LayoutProductsCategoryIndexRoute =
   LayoutProductsCategoryIndexRouteImport.update({
     id: '/products/$category/',
@@ -86,7 +80,6 @@ export interface FileRoutesByFullPath {
   '/order-history': typeof OrderHistoryIndexRoute
   '/order/': typeof OrderIndexRoute
   '/search': typeof SearchIndexRoute
-  '/api/prefetch-images/$': typeof ApiPrefetchImagesSplatRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -97,7 +90,6 @@ export interface FileRoutesByTo {
   '/order-history': typeof OrderHistoryIndexRoute
   '/order': typeof OrderIndexRoute
   '/search': typeof SearchIndexRoute
-  '/api/prefetch-images/$': typeof ApiPrefetchImagesSplatRoute
   '/products/$category': typeof LayoutProductsCategoryIndexRoute
   '/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/products/$category/$subcategory': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -111,7 +103,6 @@ export interface FileRoutesById {
   '/order-history/': typeof OrderHistoryIndexRoute
   '/order/': typeof OrderIndexRoute
   '/search/': typeof SearchIndexRoute
-  '/api/prefetch-images/$': typeof ApiPrefetchImagesSplatRoute
   '/_layout/products/$category/': typeof LayoutProductsCategoryIndexRoute
   '/_layout/products/$category/$subcategory/$product': typeof LayoutProductsCategorySubcategoryProductRoute
   '/_layout/products/$category/$subcategory/': typeof LayoutProductsCategorySubcategoryIndexRoute
@@ -125,7 +116,6 @@ export interface FileRouteTypes {
     | '/order-history'
     | '/order/'
     | '/search'
-    | '/api/prefetch-images/$'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -136,7 +126,6 @@ export interface FileRouteTypes {
     | '/order-history'
     | '/order'
     | '/search'
-    | '/api/prefetch-images/$'
     | '/products/$category'
     | '/products/$category/$subcategory/$product'
     | '/products/$category/$subcategory'
@@ -149,7 +138,6 @@ export interface FileRouteTypes {
     | '/order-history/'
     | '/order/'
     | '/search/'
-    | '/api/prefetch-images/$'
     | '/_layout/products/$category/'
     | '/_layout/products/$category/$subcategory/$product'
     | '/_layout/products/$category/$subcategory/'
@@ -160,7 +148,6 @@ export interface RootRouteChildren {
   OrderRouteRoute: typeof OrderRouteRouteWithChildren
   OrderHistoryIndexRoute: typeof OrderHistoryIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
-  ApiPrefetchImagesSplatRoute: typeof ApiPrefetchImagesSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -213,13 +200,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/$collectionName'
       preLoaderRoute: typeof LayoutCollectionNameRouteImport
       parentRoute: typeof LayoutRouteRoute
-    }
-    '/api/prefetch-images/$': {
-      id: '/api/prefetch-images/$'
-      path: '/api/prefetch-images/$'
-      fullPath: '/api/prefetch-images/$'
-      preLoaderRoute: typeof ApiPrefetchImagesSplatRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_layout/products/$category/': {
       id: '/_layout/products/$category/'
@@ -284,7 +264,6 @@ const rootRouteChildren: RootRouteChildren = {
   OrderRouteRoute: OrderRouteRouteWithChildren,
   OrderHistoryIndexRoute: OrderHistoryIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
-  ApiPrefetchImagesSplatRoute: ApiPrefetchImagesSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
