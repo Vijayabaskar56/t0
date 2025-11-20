@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams, useRouter } from "@tanstack/react-router";
+import { useParams, useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Image } from "@/components/ui/image";
 import { Input } from "@/components/ui/input";
+import { OptimisticLink } from "@/components/ui/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { Product } from "../db/schema";
@@ -128,7 +129,7 @@ export default function SearchDropdownComponent() {
 						<ScrollArea className="h-[300px]">
 							{filteredItems.length > 0 ? (
 								filteredItems.map((item, index) => (
-									<Link to={item.href} key={item.slug} preload={"intent"}>
+									<OptimisticLink to={item.href} key={item.slug}>
 										<div
 											className={cn("flex cursor-pointer items-center p-2", {
 												"bg-gray-100": index === highlightedIndex,
@@ -162,7 +163,7 @@ export default function SearchDropdownComponent() {
 											/>
 											<span className="text-sm">{item.name}</span>
 										</div>
-									</Link>
+									</OptimisticLink>
 								))
 							) : isLoading ? (
 								<div className="flex h-full items-center justify-center">

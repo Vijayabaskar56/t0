@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import type { Product } from "@/db/schema";
 import { Image } from "./image";
+import { OptimisticLink } from "./link";
 
 export function ProductLink(props: {
 	imageUrl?: string | null;
@@ -13,8 +13,7 @@ export function ProductLink(props: {
 	const { category_slug, subcategory_slug, product, imageUrl } = props;
 
 	return (
-		<Link
-			preload="intent"
+		<OptimisticLink
 			className="group flex h-[130px] w-full flex-row border px-4 py-2 hover:bg-gray-100 sm:w-[250px]"
 			to="/products/$category/$subcategory/$product"
 			params={{
@@ -42,6 +41,6 @@ export function ProductLink(props: {
 				</div>
 				<p className="overflow-hidden text-xs">{product.description}</p>
 			</div>
-		</Link>
+		</OptimisticLink>
 	);
 }

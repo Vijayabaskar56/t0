@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { getCollectionsOptions } from "@/api/query-options";
+import { OptimisticLink } from "@/components/ui/link";
 import type { Collection } from "@/db/schema";
 
 export const Route = createFileRoute("/_layout")({
@@ -37,14 +38,13 @@ function RouteComponent() {
 				<ul className="flex flex-col items-start justify-center">
 					{(allCollections as Collection[]).map((collection) => (
 						<li key={collection.slug} className="w-full">
-							<Link
+							<OptimisticLink
 								to="/$collectionName"
 								params={{ collectionName: collection.slug }}
-								preload="intent"
 								className="block w-full py-1 text-xs text-gray-800 hover:bg-accent2 hover:underline"
 							>
 								{collection.name}
-							</Link>
+							</OptimisticLink>
 						</li>
 					))}
 				</ul>

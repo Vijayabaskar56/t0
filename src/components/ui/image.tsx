@@ -23,12 +23,14 @@ export function Image({
 	...props
 }: ImageProps) {
 	// Apply Cloudflare optimization only to R2 images
-	const isR2Image = src.includes("r2.dev");
+	const isR2Image = src.includes("images.tancn.dev");
 
 	const getOptimizedUrl = (w: number, q: number) => {
 		if (!isR2Image) return src;
 		// Use Cloudflare Image Resizing for R2 images
-		return `/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`;
+		return import.meta.env.DEV
+			? src
+			: `/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`;
 	};
 
 	const srcSet = isR2Image

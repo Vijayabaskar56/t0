@@ -73,7 +73,7 @@ function RouteComponent() {
 						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
-						quality={80}
+						quality={60}
 						className="h-56 w-56 shrink-0 border-2 md:h-64 md:w-64"
 					/>
 					<p className="grow text-base">{currentProduct?.description}</p>

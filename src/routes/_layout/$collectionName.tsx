@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { getCollectionDetailsOptions } from "@/api/query-options";
 import { Image } from "@/components/ui/image";
+import { OptimisticLink } from "@/components/ui/link";
 import type { Category, Collection } from "@/db/schema";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
@@ -47,11 +48,11 @@ function RouteComponent() {
 				<h2 className="text-xl font-semibold">{collection.name}</h2>
 				<div className="flex flex-row flex-wrap justify-center gap-2 border-b-2 py-4 sm:justify-start">
 					{collection.categories.map((category) => (
-						<Link
-							preload="intent"
+						<OptimisticLink
 							key={category.name}
 							className="flex w-[125px] flex-col items-center text-center"
 							to="/products/$category"
+							preload="intent"
 							params={{
 								category: category.slug,
 							}}
@@ -67,7 +68,7 @@ function RouteComponent() {
 								quality={65}
 							/>
 							<span className="text-xs">{category.name}</span>
-						</Link>
+						</OptimisticLink>
 					))}
 				</div>
 			</div>

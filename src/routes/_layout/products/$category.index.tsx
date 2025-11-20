@@ -1,10 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
 	getCategoryOptions,
 	getCategoryProductCountOptions,
 } from "@/api/query-options";
 import { Image } from "@/components/ui/image";
+import { OptimisticLink } from "@/components/ui/link";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
 
 interface CategoryData extends Category {
@@ -69,8 +70,7 @@ function RouteComponent() {
 						</h2>
 						<div className="flex flex-row flex-wrap gap-2">
 							{subcollection.subcategories.map((subcategory) => (
-								<Link
-									preload="intent"
+								<OptimisticLink
 									key={subcategory.slug}
 									className="group flex h-full w-full flex-row gap-2 border px-4 py-2 hover:bg-gray-100 sm:w-[200px]"
 									to="/products/$category/$subcategory"
@@ -88,15 +88,15 @@ function RouteComponent() {
 											width={48}
 											height={48}
 											quality={65}
-											className="h-12 w-12 flex-shrink-0 object-cover"
+											className="h-12 w-12 shrink-0 object-cover"
 										/>
 									</div>
-									<div className="flex h-16 flex-grow flex-col items-start py-2">
+									<div className="flex h-16 grow flex-col items-start py-2">
 										<div className="text-sm font-medium text-gray-700 group-hover:underline">
 											{subcategory.name}
 										</div>
 									</div>
-								</Link>
+								</OptimisticLink>
 							))}
 						</div>
 					</div>

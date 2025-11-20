@@ -1,11 +1,12 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { createMiddleware } from "@tanstack/react-start";
 import { getCookie, setResponseHeader } from "@tanstack/react-start/server";
 import { X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import z from "zod";
 import { Image } from "@/components/ui/image";
+import { OptimisticLink } from "@/components/ui/link";
 import { db } from "@/db";
 import type { Product } from "@/db/schema";
 
@@ -381,8 +382,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 
 	return (
 		<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-gray-200 pt-4 gap-4">
-			<Link
-				preload="intent"
+			<OptimisticLink
 				to="/products/$category/$subcategory/$product"
 				params={{
 					category: product.subcategorySlug,
@@ -392,7 +392,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 				className="flex-1"
 			>
 				<div className="flex flex-row space-x-3 sm:space-x-4">
-					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 flex-shrink-0">
+					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 shrink-0">
 						<Image
 							loading="eager"
 							decoding="sync"
@@ -412,7 +412,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 						</p>
 					</div>
 				</div>
-			</Link>
+			</OptimisticLink>
 			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
 				<div className="flex items-center gap-2 order-2 sm:order-1">
 					<button

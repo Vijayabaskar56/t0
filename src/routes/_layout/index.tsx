@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
 	getCollectionsOptions,
 	getProductCountOptions,
 } from "@/api/query-options";
 import { Image } from "@/components/ui/image";
+import { OptimisticLink } from "@/components/ui/link";
 import type { Category, Collection } from "@/db/schema";
 import { seo } from "@/lib/seo";
 
@@ -60,8 +61,7 @@ function RouteComponent() {
 						<h2 className="text-xl font-semibold">{collection.name}</h2>
 						<div className="flex flex-row flex-wrap justify-center gap-2 border-b-2 py-4 sm:justify-start">
 							{collection.categories.map((category: Category) => (
-								<Link
-									preload="viewport"
+								<OptimisticLink
 									key={category.name}
 									className="flex w-[125px] flex-col items-center text-center"
 									to="/products/$category"
@@ -78,7 +78,7 @@ function RouteComponent() {
 										quality={65}
 									/>
 									<span className="text-xs">{category.name}</span>
-								</Link>
+								</OptimisticLink>
 							))}
 						</div>
 					</div>
