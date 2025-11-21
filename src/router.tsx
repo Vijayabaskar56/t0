@@ -2,17 +2,17 @@ import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { ErrorBoundary } from "./components/error-boundary";
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
-
-// Import the generated route tree
+import { SeenSetManager } from "./lib/seen-set-manager";
 import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
 export const getRouter = () => {
 	const rqContext = TanstackQuery.getContext();
+	const seenManager = new SeenSetManager();
 
 	const router = createRouter({
 		routeTree,
-		context: { ...rqContext },
+		context: { ...rqContext, seenManager },
 		defaultPreload: "intent",
 		scrollRestoration: true,
 		defaultStructuralSharing: true,

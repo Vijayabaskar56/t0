@@ -16,7 +16,7 @@ export function Image({
 	width,
 	height,
 	quality = 60,
-	loading = "lazy",
+	loading = "eager",
 	decoding = "async",
 	className,
 	blurDataURL,

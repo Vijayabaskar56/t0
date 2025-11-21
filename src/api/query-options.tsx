@@ -5,6 +5,7 @@ import {
 	getCategoryProductCount,
 	getCollectionDetails,
 	getCollections,
+	getPrefetchImages,
 	getProductCount,
 	getProductDetails,
 	getProductForSubcategory,
@@ -18,6 +19,7 @@ export const getCollectionsOptions = () =>
 	queryOptions({
 		queryKey: ["collections"],
 		queryFn: () => getCollections(),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getCollectionDetailsOptions = (collectionName: string) =>
@@ -27,6 +29,7 @@ export const getCollectionDetailsOptions = (collectionName: string) =>
 			getCollectionDetails({
 				data: { collectionName },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getCategoryOptions = (category: string) =>
@@ -36,6 +39,7 @@ export const getCategoryOptions = (category: string) =>
 			getCategory({
 				data: { category },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getCategoryProductCountOptions = (category: string) =>
@@ -45,6 +49,7 @@ export const getCategoryProductCountOptions = (category: string) =>
 			getCategoryProductCount({
 				data: { category },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getProductForSubcategoryOptions = (subcategory: string) =>
@@ -54,6 +59,7 @@ export const getProductForSubcategoryOptions = (subcategory: string) =>
 			getProductForSubcategory({
 				data: { subcategory },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getSubCategoryProductCountOptions = (subcategory: string) =>
@@ -63,6 +69,7 @@ export const getSubCategoryProductCountOptions = (subcategory: string) =>
 			getSubCategoryProductCount({
 				data: { subcategory },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getProductDetailsOptions = (product: string) =>
@@ -72,6 +79,7 @@ export const getProductDetailsOptions = (product: string) =>
 			getProductDetails({
 				data: { product },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getProductsForSubcategoryOptions = (subcategory: string) =>
@@ -81,6 +89,7 @@ export const getProductsForSubcategoryOptions = (subcategory: string) =>
 			getProductsForSubcategory({
 				data: { subcategory },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getRelatedProductsOptions = (
@@ -93,12 +102,14 @@ export const getRelatedProductsOptions = (
 			getRelatedProducts({
 				data: { subcategory, currentProductSlug },
 			}),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getProductCountOptions = () =>
 	queryOptions({
 		queryKey: ["product-count"],
 		queryFn: () => getProductCount(),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getCartOptions = () =>
@@ -108,6 +119,7 @@ export const getCartOptions = () =>
 			fetch("/order").then((res) => res.json()) as Promise<{
 				products: (Product & { quantity: number })[];
 			}>,
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const searchProductsOptions = (q: string) =>
@@ -118,4 +130,13 @@ export const searchProductsOptions = (q: string) =>
 				data: { q },
 			}),
 		enabled: q.length >= 2,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+	});
+
+export const prefetchImagesOptions = (path: string) =>
+	queryOptions({
+		queryKey: ["pre-fetch-images", path],
+		queryFn: () => getPrefetchImages({ data: { path } }),
+		enabled: typeof window !== "undefined",
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});

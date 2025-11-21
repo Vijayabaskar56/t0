@@ -1,11 +1,23 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { getCollectionDetailsOptions } from "@/api/query-options";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+	getCollectionDetailsOptions,
+	prefetchImagesOptions,
+} from "@/api/query-options";
 import { Image } from "@/components/ui/image";
-import { OptimisticLink } from "@/components/ui/link";
 import type { Category, Collection } from "@/db/schema";
+import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
+	beforeLoad: async ({ location, context }) => {
+		if (typeof window !== "undefined") {
+			const data = await context.queryClient.ensureQueryData(
+				prefetchImagesOptions(location.pathname),
+			);
+			const images = (data as { images?: PrefetchImage[] })?.images;
+			prefetchImages(images, context.seenManager);
+		}
+	},
 	loader: async ({ params, context }) => {
 		return await context.queryClient.ensureQueryData(
 			getCollectionDetailsOptions(params.collectionName),
@@ -48,7 +60,7 @@ function RouteComponent() {
 				<h2 className="text-xl font-semibold">{collection.name}</h2>
 				<div className="flex flex-row flex-wrap justify-center gap-2 border-b-2 py-4 sm:justify-start">
 					{collection.categories.map((category) => (
-						<OptimisticLink
+						<Link
 							key={category.name}
 							className="flex w-[125px] flex-col items-center text-center"
 							to="/products/$category"
@@ -65,10 +77,10 @@ function RouteComponent() {
 								className="mb-2 h-14 w-14 border hover:bg-accent2"
 								width={48}
 								height={48}
-								quality={65}
+								quality={60}
 							/>
 							<span className="text-xs">{category.name}</span>
-						</OptimisticLink>
+						</Link>
 					))}
 				</div>
 			</div>

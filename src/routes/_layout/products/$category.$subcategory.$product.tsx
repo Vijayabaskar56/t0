@@ -3,15 +3,26 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
+	prefetchImagesOptions,
 } from "@/api/query-options";
 import { AddToCartForm } from "@/components/add-to-cart-form";
 import { Image } from "@/components/ui/image";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
+import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/$product",
 )({
+	beforeLoad: async ({ location, context }) => {
+		if (typeof window !== "undefined") {
+			const data = await context.queryClient.ensureQueryData(
+				prefetchImagesOptions(location.pathname),
+			);
+			const images = (data as { images?: PrefetchImage[] })?.images;
+			prefetchImages(images, context.seenManager);
+		}
+	},
 	component: RouteComponent,
 	loader: async ({ params, context }) => {
 		await Promise.all([
@@ -47,7 +58,6 @@ function RouteComponent() {
 	const { data: relatedProductsData } = useSuspenseQuery(
 		getProductsForSubcategoryOptions(subcategory),
 	);
-
 	const currentProduct = productData as unknown as Product;
 	const relatedProducts = relatedProductsData as unknown as Product[];
 

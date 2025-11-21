@@ -1,8 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-
-
 // Collections: ID-based primary key (auto-increment)
 export const collections = sqliteTable("collections", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),

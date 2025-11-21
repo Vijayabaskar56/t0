@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	getCollectionsOptions,
 	getProductCountOptions,
+	prefetchImagesOptions,
 } from "@/api/query-options";
 import { Image } from "@/components/ui/image";
-import { OptimisticLink } from "@/components/ui/link";
 import type { Category, Collection } from "@/db/schema";
+import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 import { seo } from "@/lib/seo";
 
 interface LayoutLoaderData {
@@ -14,6 +15,15 @@ interface LayoutLoaderData {
 }
 
 export const Route = createFileRoute("/_layout/")({
+	beforeLoad: async ({ location, context }) => {
+		if (typeof window !== "undefined") {
+			const data = await context.queryClient.ensureQueryData(
+				prefetchImagesOptions(location.pathname),
+			);
+			const images = (data as { images?: PrefetchImage[] })?.images;
+			prefetchImages(images, context.seenManager);
+		}
+	},
 	loader: async ({ context }) => {
 		const [collections, productCount] = await Promise.all([
 			context.queryClient.ensureQueryData(getCollectionsOptions()),
@@ -61,11 +71,12 @@ function RouteComponent() {
 						<h2 className="text-xl font-semibold">{collection.name}</h2>
 						<div className="flex flex-row flex-wrap justify-center gap-2 border-b-2 py-4 sm:justify-start">
 							{collection.categories.map((category: Category) => (
-								<OptimisticLink
+								<Link
 									key={category.name}
 									className="flex w-[125px] flex-col items-center text-center"
 									to="/products/$category"
 									params={{ category: category.slug }}
+									preload="intent"
 								>
 									<Image
 										loading={imageCount++ < 15 ? "eager" : "lazy"}
@@ -78,7 +89,7 @@ function RouteComponent() {
 										quality={65}
 									/>
 									<span className="text-xs">{category.name}</span>
-								</OptimisticLink>
+								</Link>
 							))}
 						</div>
 					</div>

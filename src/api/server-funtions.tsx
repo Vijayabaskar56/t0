@@ -752,6 +752,8 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 				loading?: string;
 			}> = [];
 
+			let imageCount = 0;
+
 			switch (routeInfo.type) {
 				case "product": {
 					// Get product + subcategory + category images
@@ -774,7 +776,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 						images.push({
 							src: data.imageUrl,
 							alt: data.name,
-							loading: "eager",
+							loading: imageCount++ < 20 ? "eager" : "lazy",
 						});
 					}
 
@@ -782,7 +784,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 						images.push({
 							src: data.subcategory.imageUrl,
 							alt: data.subcategory.name,
-							loading: "lazy",
+							loading: imageCount++ < 20 ? "eager" : "lazy",
 						});
 					}
 
@@ -790,7 +792,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 						images.push({
 							src: data.subcategory.subcollection.category.imageUrl,
 							alt: data.subcategory.subcollection.category.name,
-							loading: "lazy",
+							loading: imageCount++ < 20 ? "eager" : "lazy",
 						});
 					}
 					break;
@@ -818,7 +820,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 								images.push({
 									src: product.imageUrl,
 									alt: product.name,
-									loading: "lazy",
+									loading: imageCount++ < 20 ? "eager" : "lazy",
 								});
 							}
 						}
@@ -829,7 +831,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 						images.push({
 							src: data.imageUrl,
 							alt: data.name,
-							loading: "lazy",
+							loading: imageCount++ < 20 ? "eager" : "lazy",
 						});
 					}
 
@@ -838,7 +840,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 						images.push({
 							src: data.subcollection.category.imageUrl,
 							alt: data.subcollection.category.name,
-							loading: "lazy",
+							loading: imageCount++ < 20 ? "eager" : "lazy",
 						});
 					}
 					break;
@@ -866,7 +868,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 									images.push({
 										src: subcategory.imageUrl,
 										alt: subcategory.name,
-										loading: "lazy",
+										loading: imageCount++ < 20 ? "eager" : "lazy",
 									});
 								}
 							}
@@ -878,7 +880,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 						images.push({
 							src: data.imageUrl,
 							alt: data.name,
-							loading: "lazy",
+							loading: imageCount++ < 20 ? "eager" : "lazy",
 						});
 					}
 					break;
@@ -901,7 +903,7 @@ const getPrefetchImages = createServerFn({ method: "GET" })
 								images.push({
 									src: category.imageUrl,
 									alt: category.name,
-									loading: "lazy",
+									loading: imageCount++ < 20 ? "eager" : "lazy",
 								});
 							}
 						}

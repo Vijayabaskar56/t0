@@ -3,9 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
 	getProductForSubcategoryOptions,
 	getSubCategoryProductCountOptions,
+	prefetchImagesOptions,
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
+import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 import { seo } from "@/lib/seo";
 
 interface ProductCountData {
@@ -15,7 +17,19 @@ interface ProductCountData {
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/",
 )({
-	loader: async ({ params, context }) => {
+	beforeLoad: async ({ location, context }) => {
+		const data = await context.queryClient.ensureQueryData(
+			prefetchImagesOptions(location.pathname),
+		);
+		console.log("🚀 ~ data:", data, context.seenManager.getSize());
+		if (data) {
+			const images = (data as { images?: PrefetchImage[] })?.images;
+			prefetchImages(images, context.seenManager);
+		}
+	},
+	loader: async ({ params, context, location }) => {
+		// Fire-and-forget image prefetch
+		context.queryClient.prefetchQuery(prefetchImagesOptions(location.pathname));
 		await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductForSubcategoryOptions(params.subcategory),

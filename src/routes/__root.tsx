@@ -4,6 +4,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
+	Link,
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
@@ -11,8 +12,8 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
 import CartCount from "@/components/cart-count";
 import { Image } from "@/components/ui/image";
-import { OptimisticLink } from "@/components/ui/link";
 import { WelcomeToast } from "@/components/welcome-toast";
+import type { SeenSetManager } from "@/lib/seen-set-manager";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
@@ -22,6 +23,7 @@ const SearchDropdownComponent = lazy(
 
 interface MyRouterContext {
 	queryClient: QueryClient;
+	seenManager: SeenSetManager;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -61,9 +63,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						<div className="flex grow flex-col">
 							<div className="absolute right-2 top-2 flex justify-end pt-2 font-sans text-sm hover:underline sm:relative sm:right-0 sm:top-0"></div>
 							<div className="flex w-full flex-col items-start justify-center sm:w-auto sm:flex-row sm:items-center sm:gap-2">
-								<OptimisticLink
+								<Link
 									to="/"
 									className="text-2xl font-bold text-accent1"
+									preload="intent"
 								>
 									<span className="flex flex-row gap-2">
 										<Image
@@ -74,7 +77,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 										/>
 										TanStack Start Faster
 									</span>
-								</OptimisticLink>
+								</Link>
 								<div className="items flex w-full flex-row items-center justify-between gap-4">
 									<div className="mx-0 grow sm:mx-auto sm:grow-0">
 										<Suspense
@@ -87,25 +90,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 									</div>
 									<div className="flex flex-row justify-between space-x-4">
 										<div className="relative">
-											<OptimisticLink
+											<Link
 												to="/order"
 												className="text-lg text-accent1 hover:underline"
 											>
 												ORDER
-											</OptimisticLink>
+											</Link>
 											<CartCount />
 										</div>
-										<OptimisticLink
+										<Link
 											to="/order-history"
 											className="hidden text-lg text-accent1 hover:underline md:block"
 										>
 											ORDER HISTORY
-										</OptimisticLink>
-										<OptimisticLink
+										</Link>
+										<Link
 											to="/order-history"
 											aria-label="Order History"
 											className="block text-lg text-accent1 hover:underline md:hidden"
-										></OptimisticLink>
+										></Link>
 									</div>
 								</div>
 							</div>

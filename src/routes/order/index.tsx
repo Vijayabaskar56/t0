@@ -392,7 +392,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 				className="flex-1"
 			>
 				<div className="flex flex-row space-x-3 sm:space-x-4">
-					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 shrink-0">
+					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 flex-shrink-0">
 						<Image
 							loading="eager"
 							decoding="sync"

@@ -1,12 +1,13 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	getCategoryOptions,
 	getCategoryProductCountOptions,
+	prefetchImagesOptions,
 } from "@/api/query-options";
 import { Image } from "@/components/ui/image";
-import { OptimisticLink } from "@/components/ui/link";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
+import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
 interface CategoryData extends Category {
 	subcollections: (Subcollection & {
@@ -19,7 +20,18 @@ interface ProductCountData {
 }
 
 export const Route = createFileRoute("/_layout/products/$category/")({
+	beforeLoad: async ({ context, location }) => {
+		if (typeof window !== "undefined") {
+			const data = await context.queryClient.ensureQueryData(
+				prefetchImagesOptions(location.pathname),
+			);
+			const images = (data as { images?: PrefetchImage[] })?.images;
+			prefetchImages(images, context.seenManager);
+		}
+	},
 	loader: async ({ params, context }) => {
+		// Fire-and-forget image prefetch
+
 		await Promise.all([
 			context.queryClient.ensureQueryData(getCategoryOptions(params.category)),
 			context.queryClient.ensureQueryData(
@@ -70,7 +82,7 @@ function RouteComponent() {
 						</h2>
 						<div className="flex flex-row flex-wrap gap-2">
 							{subcollection.subcategories.map((subcategory) => (
-								<OptimisticLink
+								<Link
 									key={subcategory.slug}
 									className="group flex h-full w-full flex-row gap-2 border px-4 py-2 hover:bg-gray-100 sm:w-[200px]"
 									to="/products/$category/$subcategory"
@@ -78,6 +90,7 @@ function RouteComponent() {
 										category: categoryTyped.slug,
 										subcategory: subcategory.slug,
 									}}
+									preload="intent"
 								>
 									<div className="py-2">
 										<Image
@@ -87,7 +100,7 @@ function RouteComponent() {
 											alt={`${subcategory.name}`}
 											width={48}
 											height={48}
-											quality={65}
+											quality={60}
 											className="h-12 w-12 shrink-0 object-cover"
 										/>
 									</div>
@@ -96,7 +109,7 @@ function RouteComponent() {
 											{subcategory.name}
 										</div>
 									</div>
-								</OptimisticLink>
+								</Link>
 							))}
 						</div>
 					</div>
