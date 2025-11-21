@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
 	getProductForSubcategoryOptions,
 	getSubCategoryProductCountOptions,
-	prefetchImagesOptions,
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
@@ -17,19 +16,26 @@ interface ProductCountData {
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/",
 )({
-	beforeLoad: async ({ location, context }) => {
-		const data = await context.queryClient.ensureQueryData(
-			prefetchImagesOptions(location.pathname),
-		);
-		console.log("🚀 ~ data:", data, context.seenManager.getSize());
-		if (data) {
-			const images = (data as { images?: PrefetchImage[] })?.images;
+	beforeLoad: async ({ params, context }) => {
+		if (typeof window !== "undefined") {
+			const productsData = (await context.queryClient.ensureQueryData(
+				getProductForSubcategoryOptions(params.subcategory),
+			)) as unknown as Product[];
+
+			let count = 0;
+			const images: PrefetchImage[] =
+				productsData
+					?.filter((product) => product.imageUrl)
+					.map((product) => ({
+						src: product.imageUrl ?? "/placeholder.webp",
+						alt: product.name,
+						loading: count++ < 15 ? "eager" : "lazy",
+					})) ?? [];
+
 			prefetchImages(images, context.seenManager);
 		}
 	},
-	loader: async ({ params, context, location }) => {
-		// Fire-and-forget image prefetch
-		context.queryClient.prefetchQuery(prefetchImagesOptions(location.pathname));
+	loader: async ({ params, context }) => {
 		await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductForSubcategoryOptions(params.subcategory),

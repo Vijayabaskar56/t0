@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
-	prefetchImagesOptions,
 } from "@/api/query-options";
 import { AddToCartForm } from "@/components/add-to-cart-form";
 import { Image } from "@unpic/react";
@@ -14,12 +13,38 @@ import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/$product",
 )({
-	beforeLoad: async ({ location, context }) => {
+	beforeLoad: async ({ params, context }) => {
 		if (typeof window !== "undefined") {
-			const data = await context.queryClient.ensureQueryData(
-				prefetchImagesOptions(location.pathname),
-			);
-			const images = (data as { images?: PrefetchImage[] })?.images;
+			const [productData, relatedProductsData] = await Promise.all([
+				context.queryClient.ensureQueryData(
+					getProductDetailsOptions(params.product),
+				),
+				context.queryClient.ensureQueryData(
+					getProductsForSubcategoryOptions(params.subcategory),
+				),
+			]);
+
+			const currentProduct = productData as unknown as Product;
+			const relatedProducts = relatedProductsData as unknown as Product[];
+
+			let count = 0;
+			const images: PrefetchImage[] = [
+				currentProduct?.imageUrl
+					? {
+							src: currentProduct.imageUrl,
+							alt: currentProduct.name,
+							loading: "eager",
+						}
+					: null,
+				...relatedProducts
+					.filter((p) => p.imageUrl && p.slug !== params.product)
+					.map((product) => ({
+						src: product.imageUrl ?? "/placeholder.webp",
+						alt: product.name,
+						loading: count++ < 15 ? "eager" : "lazy",
+					})),
+			].filter(Boolean) as PrefetchImage[];
+
 			prefetchImages(images, context.seenManager);
 		}
 	},

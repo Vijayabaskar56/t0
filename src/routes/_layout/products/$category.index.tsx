@@ -1,11 +1,10 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Image } from "@unpic/react";
 import {
 	getCategoryOptions,
 	getCategoryProductCountOptions,
-	prefetchImagesOptions,
 } from "@/api/query-options";
-import { Image } from "@unpic/react";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
@@ -20,12 +19,25 @@ interface ProductCountData {
 }
 
 export const Route = createFileRoute("/_layout/products/$category/")({
-	beforeLoad: async ({ context, location }) => {
+	beforeLoad: async ({ context, params }) => {
 		if (typeof window !== "undefined") {
-			const data = await context.queryClient.ensureQueryData(
-				prefetchImagesOptions(location.pathname),
-			);
-			const images = (data as { images?: PrefetchImage[] })?.images;
+			const categoryData = (await context.queryClient.ensureQueryData(
+				getCategoryOptions(params.category),
+			)) as unknown as CategoryData;
+
+			let count = 0;
+			const images: PrefetchImage[] =
+				categoryData?.subcollections?.flatMap((subcollection) =>
+					subcollection.subcategories
+						.filter((subcat) => subcat.imageUrl)
+						.map((subcat) => ({
+							src: subcat.imageUrl ?? "/placeholder.webp",
+							alt: subcat.name,
+							loading: count++ < 15 ? "eager" : "lazy",
+						})),
+				) ?? [];
+			console.log("🚀 ~ images:", images);
+
 			prefetchImages(images, context.seenManager);
 		}
 	},

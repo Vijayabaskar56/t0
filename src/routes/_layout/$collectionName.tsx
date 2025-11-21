@@ -1,20 +1,27 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-	getCollectionDetailsOptions,
-	prefetchImagesOptions,
-} from "@/api/query-options";
+import { getCollectionDetailsOptions } from "@/api/query-options";
 import { Image } from "@unpic/react";
 import type { Category, Collection } from "@/db/schema";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
-	beforeLoad: async ({ location, context }) => {
+	beforeLoad: async ({ params, context }) => {
 		if (typeof window !== "undefined") {
-			const data = await context.queryClient.ensureQueryData(
-				prefetchImagesOptions(location.pathname),
-			);
-			const images = (data as { images?: PrefetchImage[] })?.images;
+			const collectionDetails = (await context.queryClient.ensureQueryData(
+				getCollectionDetailsOptions(params.collectionName),
+			)) as unknown as (Collection & { categories: Category[] })[];
+
+			let count = 0;
+			const images: PrefetchImage[] =
+				collectionDetails?.[0]?.categories
+					?.filter((cat) => cat.imageUrl)
+					.map((cat) => ({
+						src: cat.imageUrl ?? "/placeholder.webp",
+						alt: cat.name,
+						loading: count++ < 15 ? "eager" : "lazy",
+					})) ?? [];
+
 			prefetchImages(images, context.seenManager);
 		}
 	},

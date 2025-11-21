@@ -3,7 +3,6 @@ import { Image } from "@unpic/react";
 import {
 	getCollectionsOptions,
 	getProductCountOptions,
-	prefetchImagesOptions,
 } from "@/api/query-options";
 // import { Image } from "@/components/ui/image";
 import type { Category, Collection } from "@/db/schema";
@@ -16,12 +15,25 @@ interface LayoutLoaderData {
 }
 
 export const Route = createFileRoute("/_layout/")({
-	beforeLoad: async ({ location, context }) => {
+	beforeLoad: async ({ context }) => {
 		if (typeof window !== "undefined") {
-			const data = await context.queryClient.ensureQueryData(
-				prefetchImagesOptions(location.pathname),
+			const collections = (await context.queryClient.ensureQueryData(
+				getCollectionsOptions(),
+			)) as (Collection & { categories: Category[] })[];
+
+			let count = 0;
+			const images: PrefetchImage[] = collections.flatMap(
+				(collection: Collection & { categories: Category[] }) =>
+					collection.categories
+						.filter((cat: Category) => cat.imageUrl)
+						.map((cat: Category) => ({
+							src: cat.imageUrl ?? "/placeholder.webp",
+							alt: cat.name,
+							loading: count++ < 15 ? "eager" : "lazy",
+						})),
 			);
-			const images = (data as { images?: PrefetchImage[] })?.images;
+			console.log("🚀 ~ images:", images);
+
 			prefetchImages(images, context.seenManager);
 		}
 	},
