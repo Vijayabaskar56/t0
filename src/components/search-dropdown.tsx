@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Image } from "@/components/ui/image";
+import { Image } from "@unpic/react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -158,7 +158,18 @@ export default function SearchDropdownComponent() {
 												className="h-10 w-10 pr-2"
 												height={40}
 												width={40}
-												quality={70}
+												options={{
+													cloudflare: {
+														domain: "images.tancn.dev",
+													},
+												}}
+												operations={{
+													cloudflare: {
+														width: 40,
+														height: 40,
+														quality: 65,
+													},
+												}}
 											/>
 											<span className="text-sm">{item.name}</span>
 										</div>

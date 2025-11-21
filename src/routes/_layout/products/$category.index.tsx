@@ -5,7 +5,7 @@ import {
 	getCategoryProductCountOptions,
 	prefetchImagesOptions,
 } from "@/api/query-options";
-import { Image } from "@/components/ui/image";
+import { Image } from "@unpic/react";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
@@ -100,8 +100,19 @@ function RouteComponent() {
 											alt={`${subcategory.name}`}
 											width={48}
 											height={48}
-											quality={60}
 											className="h-12 w-12 shrink-0 object-cover"
+											options={{
+												cloudflare: {
+													domain: "images.tancn.dev",
+												},
+											}}
+											operations={{
+												cloudflare: {
+													width: 48,
+													height: 48,
+													quality: 60,
+												},
+											}}
 										/>
 									</div>
 									<div className="flex h-16 grow flex-col items-start py-2">

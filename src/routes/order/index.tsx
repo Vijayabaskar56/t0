@@ -5,7 +5,7 @@ import { getCookie, setResponseHeader } from "@tanstack/react-start/server";
 import { X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import z from "zod";
-import { Image } from "@/components/ui/image";
+import { Image } from "@unpic/react";
 import { OptimisticLink } from "@/components/ui/link";
 import { db } from "@/db";
 import type { Product } from "@/db/schema";
@@ -400,7 +400,18 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 							alt="Product"
 							width={256}
 							height={256}
-							quality={75}
+							options={{
+								cloudflare: {
+									domain: "images.tancn.dev",
+								},
+							}}
+							operations={{
+								cloudflare: {
+									width: 256,
+									height: 256,
+									quality: 65,
+								},
+							}}
 						/>
 					</div>
 					<div className="flex-1 min-w-0">

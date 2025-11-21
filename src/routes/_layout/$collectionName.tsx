@@ -4,7 +4,7 @@ import {
 	getCollectionDetailsOptions,
 	prefetchImagesOptions,
 } from "@/api/query-options";
-import { Image } from "@/components/ui/image";
+import { Image } from "@unpic/react";
 import type { Category, Collection } from "@/db/schema";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
@@ -77,7 +77,18 @@ function RouteComponent() {
 								className="mb-2 h-14 w-14 border hover:bg-accent2"
 								width={48}
 								height={48}
-								quality={60}
+								options={{
+									cloudflare: {
+										domain: "images.tancn.dev",
+									},
+								}}
+								operations={{
+									cloudflare: {
+										width: 48,
+										height: 48,
+										quality: 60,
+									},
+								}}
 							/>
 							<span className="text-xs">{category.name}</span>
 						</Link>

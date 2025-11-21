@@ -6,7 +6,7 @@ import {
 	prefetchImagesOptions,
 } from "@/api/query-options";
 import { AddToCartForm } from "@/components/add-to-cart-form";
-import { Image } from "@/components/ui/image";
+import { Image } from "@unpic/react";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
@@ -83,8 +83,19 @@ function RouteComponent() {
 						alt={`${currentProduct?.name}`}
 						height={256}
 						width={256}
-						quality={60}
 						className="h-56 w-56 shrink-0 border-2 md:h-64 md:w-64"
+						options={{
+							cloudflare: {
+								domain: "images.tancn.dev",
+							},
+						}}
+						operations={{
+							cloudflare: {
+								width: 256,
+								height: 256,
+								quality: 60,
+							},
+						}}
 					/>
 					<p className="grow text-base">{currentProduct?.description}</p>
 				</div>
