@@ -67,7 +67,7 @@ const signUp = createServerFn({ method: "POST" })
 				return { error: "Failed to create user. Please try again." };
 			}
 
-			await setSession(createdUser);
+			await setSession(createdUser, ctx.context);
 
 			return { success: true, user: createdUser };
 		} catch (error) {
@@ -108,7 +108,7 @@ const signIn = createServerFn({ method: "POST" })
 				return { error: "Invalid username or password. Please try again." };
 			}
 
-			await setSession(foundUser);
+			await setSession(foundUser, ctx.context);
 
 			return { success: true, user: foundUser };
 		} catch (error) {
@@ -677,7 +677,7 @@ const searchProducts = createServerFn({ method: "GET" })
 		}
 	});
 
-const getUser = createServerFn({ method: "GET" }).handler(async () => {
+const getUser = createServerFn({ method: "GET" }).handler(async (ctx) => {
 	try {
 		const sessionCookie = getRequest()
 			.headers.get("cookie")
@@ -687,7 +687,10 @@ const getUser = createServerFn({ method: "GET" }).handler(async () => {
 			return null;
 		}
 
-		const sessionData = await verifyToken(decodeURIComponent(sessionCookie));
+		const sessionData = await verifyToken(
+			decodeURIComponent(sessionCookie),
+			ctx.context,
+		);
 
 		if (
 			!sessionData ||

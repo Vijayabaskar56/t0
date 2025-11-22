@@ -12,6 +12,7 @@ declare namespace Cloudflare {
 		CART_READ_LIMITER: RateLimit;
 		CART_WRITE_LIMITER: RateLimit;
 		API_LIMITER: RateLimit;
+		AUTH_SECRET: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
