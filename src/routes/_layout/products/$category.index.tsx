@@ -36,7 +36,6 @@ export const Route = createFileRoute("/_layout/products/$category/")({
 							loading: count++ < 15 ? "eager" : "lazy",
 						})),
 				) ?? [];
-			console.log("🚀 ~ images:", images);
 
 			prefetchImages(images, context.seenManager);
 		}
