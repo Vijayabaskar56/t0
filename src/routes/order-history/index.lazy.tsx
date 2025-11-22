@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 
-export const Route = createFileRoute("/order-history/")({
+export const Route = createLazyFileRoute("/order-history/")({
 	component: RouteComponent,
 });
 
@@ -36,5 +36,5 @@ function RouteComponent() {
 				</Suspense>
 			</div>
 		</main>
-	);
+	)
 }

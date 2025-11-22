@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import z from "zod";
 import { db } from "@/db";
 import {
@@ -11,6 +11,12 @@ import {
 	subcollections,
 	users,
 } from "@/db/schema";
+import {
+	comparePasswords,
+	hashPassword,
+	setSession,
+	verifyToken,
+} from "@/lib/auth";
 import type { RequestContext } from "@/server";
 
 // Helper function to check rate limit
@@ -48,8 +54,7 @@ const signUp = createServerFn({ method: "POST" })
 				return { error: "Username already taken. Please try again." };
 			}
 
-			// Password hashing (simplified - you'll need to implement hashPassword)
-			const passwordHash = password; // Replace with: await hashPassword(password);
+			const passwordHash = await hashPassword(password);
 
 			const newUser: NewUser = {
 				username,
@@ -62,8 +67,7 @@ const signUp = createServerFn({ method: "POST" })
 				return { error: "Failed to create user. Please try again." };
 			}
 
-			// Session setting (simplified - you'll need to implement setSession)
-			// await setSession(createdUser);
+			await setSession(createdUser);
 
 			return { success: true, user: createdUser };
 		} catch (error) {
@@ -95,15 +99,16 @@ const signIn = createServerFn({ method: "POST" })
 
 			const { user: foundUser } = user[0];
 
-			// Password comparison (simplified - you'll need to implement comparePasswords)
-			const isPasswordValid = password === foundUser.passwordHash; // Replace with: await comparePasswords(password, foundUser.passwordHash);
+			const isPasswordValid = await comparePasswords(
+				password,
+				foundUser.passwordHash,
+			);
 
 			if (!isPasswordValid) {
 				return { error: "Invalid username or password. Please try again." };
 			}
 
-			// Session setting (simplified - you'll need to implement setSession)
-			// await setSession(foundUser);
+			await setSession(foundUser);
 
 			return { success: true, user: foundUser };
 		} catch (error) {
@@ -132,11 +137,11 @@ const getCollections = createServerFn({ method: "GET" }).handler(
 				orderBy: (collections, { asc }) => asc(collections.name),
 			});
 
-			// Cache the result for 2 hours using waitUntil for fire-and-forget caching
+			// Cache collections for 24 hours (rarely change)
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put("collections", JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 86400,
 					}),
 				);
 			}
@@ -171,10 +176,11 @@ const getCollectionDetails = createServerFn({ method: "GET" })
 				orderBy: (collections, { asc }) => asc(collections.slug),
 			});
 
+			// Cache collection details for 24 hours
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 86400,
 					}),
 				);
 			}
@@ -210,10 +216,11 @@ const getCategory = createServerFn({ method: "GET" })
 					},
 				},
 			});
+			// Cache categories for 12 hours
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 43200,
 					}),
 				);
 			}
@@ -253,10 +260,11 @@ const getCategoryProductCount = createServerFn({ method: "GET" })
 				.leftJoin(products, eq(subcategories.slug, products.subcategorySlug))
 				.where(eq(categories.slug, category));
 
+			// Cache product counts for 12 hours
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 43200,
 					}),
 				);
 			}
@@ -288,10 +296,11 @@ const getProductForSubcategory = createServerFn({ method: "GET" })
 				orderBy: (products, { asc }) => asc(products.slug),
 			});
 
+			// Cache products for 1 hour
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 3600,
 					}),
 				);
 			}
@@ -322,10 +331,11 @@ const getSubCategoryProductCount = createServerFn({ method: "GET" })
 				.from(products)
 				.where(eq(products.subcategorySlug, subcategory));
 
+			// Cache subcategory product counts for 12 hours
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 43200,
 					}),
 				);
 			}
@@ -355,10 +365,11 @@ const getProductDetails = createServerFn({ method: "GET" })
 				where: (products, { eq }) => eq(products.slug, product),
 			});
 
+			// Cache product details for 1 hour
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 3600,
 					}),
 				);
 			}
@@ -369,40 +380,8 @@ const getProductDetails = createServerFn({ method: "GET" })
 		}
 	});
 
-const getProductsForSubcategory = createServerFn({ method: "GET" })
-	.inputValidator(
-		z.object({
-			subcategory: z.string(),
-		}),
-	)
-	.handler(async (ctx) => {
-		try {
-			const { subcategory } = ctx.data;
-			const cacheKey = `products-subcategory-${subcategory}`;
-			const cacheHit = await ctx.context?.env.CACHE.get(cacheKey, "json");
-			if (cacheHit && cacheHit !== null && cacheHit !== undefined) {
-				return cacheHit;
-			}
-
-			const data = await db.query.products.findMany({
-				where: (products, { eq, and }) =>
-					and(eq(products.subcategorySlug, subcategory)),
-				orderBy: (products, { asc }) => asc(products.slug),
-			});
-
-			if (data) {
-				ctx.context?.waitUntil(
-					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
-					}),
-				);
-			}
-			return data;
-		} catch (error) {
-			console.error("Error fetching products for subcategory:", error);
-			throw new Error("Failed to fetch products for subcategory");
-		}
-	});
+// Alias for backward compatibility
+const getProductsForSubcategory = getProductForSubcategory;
 
 const getRelatedProducts = createServerFn({ method: "GET" })
 	.inputValidator(
@@ -447,10 +426,11 @@ const getRelatedProducts = createServerFn({ method: "GET" })
 				return a.slug.localeCompare(b.slug);
 			});
 
+			// Cache related products for 1 hour
 			if (sortedData) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(sortedData), {
-						expirationTtl: 7200,
+						expirationTtl: 3600,
 					}),
 				);
 			}
@@ -472,10 +452,11 @@ const getProductCount = createServerFn({ method: "GET" }).handler(
 
 			const data = await db.select({ count: count() }).from(products);
 
+			// Cache total product count for 12 hours
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 7200,
+						expirationTtl: 43200,
 					}),
 				);
 			}
@@ -681,6 +662,7 @@ const searchProducts = createServerFn({ method: "GET" })
 				href: `/products/${product.subcategorySlug}/${product.slug}`,
 			}));
 
+			// Cache search results for 2 hours
 			if (results) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(results), {
@@ -695,244 +677,59 @@ const searchProducts = createServerFn({ method: "GET" })
 		}
 	});
 
-// Path parser for route type detection
-function parseRoutePath(path: string) {
-	const segments = path.split("/").filter(Boolean);
+const getUser = createServerFn({ method: "GET" }).handler(async () => {
+	try {
+		const sessionCookie = getRequest()
+			.headers.get("cookie")
+			?.match(/session=([^;]+)/)?.[1];
 
-	if (segments[0] === "products" && segments.length === 4) {
-		return {
-			type: "product" as const,
-			category: segments[1],
-			subcategory: segments[2],
-			product: segments[3],
-		};
-	}
-	if (segments[0] === "products" && segments.length === 3) {
-		return {
-			type: "subcategory" as const,
-			category: segments[1],
-			subcategory: segments[2],
-		};
-	}
-	if (segments[0] === "products" && segments.length === 2) {
-		return { type: "category" as const, category: segments[1] };
-	}
-	if (segments.length === 1) {
-		return { type: "collection" as const, collection: segments[0] };
-	}
-	return null;
-}
-
-// Image prefetching for all route types
-const getPrefetchImages = createServerFn({ method: "GET" })
-	.inputValidator(
-		z.object({
-			path: z.string(),
-		}),
-	)
-	.handler(async (ctx) => {
-		try {
-			const { path } = ctx.data;
-			const cacheKey = `prefetch-images-${path}`;
-			const cacheHit = await ctx.context?.env.CACHE.get(cacheKey, "json");
-			if (cacheHit && cacheHit !== null && cacheHit !== undefined) {
-				return cacheHit;
-			}
-
-			const routeInfo = parseRoutePath(path);
-			if (!routeInfo) {
-				return { images: [] };
-			}
-
-			const images: Array<{
-				src: string;
-				srcset?: string | null;
-				sizes?: string | null;
-				alt?: string;
-				loading?: string;
-			}> = [];
-
-			let imageCount = 0;
-
-			switch (routeInfo.type) {
-				case "product": {
-					// Get product + subcategory + category images
-					const data = await db.query.products.findFirst({
-						where: (products, { eq }) => eq(products.slug, routeInfo.product),
-						with: {
-							subcategory: {
-								with: {
-									subcollection: {
-										with: {
-											category: true,
-										},
-									},
-								},
-							},
-						},
-					});
-
-					if (data?.imageUrl) {
-						images.push({
-							src: data.imageUrl,
-							alt: data.name,
-							loading: imageCount++ < 20 ? "eager" : "lazy",
-						});
-					}
-
-					if (data?.subcategory?.imageUrl) {
-						images.push({
-							src: data.subcategory.imageUrl,
-							alt: data.subcategory.name,
-							loading: imageCount++ < 20 ? "eager" : "lazy",
-						});
-					}
-
-					if (data?.subcategory?.subcollection?.category?.imageUrl) {
-						images.push({
-							src: data.subcategory.subcollection.category.imageUrl,
-							alt: data.subcategory.subcollection.category.name,
-							loading: imageCount++ < 20 ? "eager" : "lazy",
-						});
-					}
-					break;
-				}
-
-				case "subcategory": {
-					// Get all products in subcategory + subcategory + category images
-					const data = await db.query.subcategories.findFirst({
-						where: (subcategories, { eq }) =>
-							eq(subcategories.slug, routeInfo.subcategory),
-						with: {
-							products: true,
-							subcollection: {
-								with: {
-									category: true,
-								},
-							},
-						},
-					});
-
-					// Add all product images
-					if (data?.products) {
-						for (const product of data.products) {
-							if (product.imageUrl) {
-								images.push({
-									src: product.imageUrl,
-									alt: product.name,
-									loading: imageCount++ < 20 ? "eager" : "lazy",
-								});
-							}
-						}
-					}
-
-					// Add subcategory image
-					if (data?.imageUrl) {
-						images.push({
-							src: data.imageUrl,
-							alt: data.name,
-							loading: imageCount++ < 20 ? "eager" : "lazy",
-						});
-					}
-
-					// Add category image
-					if (data?.subcollection?.category?.imageUrl) {
-						images.push({
-							src: data.subcollection.category.imageUrl,
-							alt: data.subcollection.category.name,
-							loading: imageCount++ < 20 ? "eager" : "lazy",
-						});
-					}
-					break;
-				}
-
-				case "category": {
-					// Get all subcategories in category + category image
-					const data = await db.query.categories.findFirst({
-						where: (categories, { eq }) =>
-							eq(categories.slug, routeInfo.category),
-						with: {
-							subcollections: {
-								with: {
-									subcategories: true,
-								},
-							},
-						},
-					});
-
-					// Add all subcategory images
-					if (data?.subcollections) {
-						for (const subcollection of data.subcollections) {
-							for (const subcategory of subcollection.subcategories) {
-								if (subcategory.imageUrl) {
-									images.push({
-										src: subcategory.imageUrl,
-										alt: subcategory.name,
-										loading: imageCount++ < 20 ? "eager" : "lazy",
-									});
-								}
-							}
-						}
-					}
-
-					// Add category image
-					if (data?.imageUrl) {
-						images.push({
-							src: data.imageUrl,
-							alt: data.name,
-							loading: imageCount++ < 20 ? "eager" : "lazy",
-						});
-					}
-					break;
-				}
-
-				case "collection": {
-					// Get all categories in collection
-					const data = await db.query.collections.findFirst({
-						where: (collections, { eq }) =>
-							eq(collections.slug, routeInfo.collection),
-						with: {
-							categories: true,
-						},
-					});
-
-					// Add all category images
-					if (data?.categories) {
-						for (const category of data.categories) {
-							if (category.imageUrl) {
-								images.push({
-									src: category.imageUrl,
-									alt: category.name,
-									loading: imageCount++ < 20 ? "eager" : "lazy",
-								});
-							}
-						}
-					}
-					break;
-				}
-			}
-
-			// Remove duplicates and filter out null/undefined images
-			const uniqueImages = images.filter(
-				(img, index, self) =>
-					img.src && self.findIndex((i) => i.src === img.src) === index,
-			);
-
-			const result = { images: uniqueImages };
-
-			// Cache the result
-			ctx.context?.waitUntil(
-				ctx.context.env.CACHE.put(cacheKey, JSON.stringify(result), {
-					expirationTtl: 7200, // 2 hours
-				}),
-			);
-
-			return result;
-		} catch (error) {
-			console.error("Error fetching prefetch images:", error);
-			return { images: [] };
+		if (!sessionCookie) {
+			return null;
 		}
-	});
+
+		const sessionData = await verifyToken(decodeURIComponent(sessionCookie));
+
+		if (
+			!sessionData ||
+			!sessionData.user ||
+			typeof sessionData.user.id !== "number"
+		) {
+			return null;
+		}
+
+		if (new Date(sessionData.expires) < new Date()) {
+			return null;
+		}
+
+		const user = await db
+			.select()
+			.from(users)
+			.where(and(eq(users.id, sessionData.user.id)))
+			.limit(1);
+
+		if (user.length === 0) {
+			return null;
+		}
+
+		return user[0];
+	} catch (error) {
+		console.error("Error getting user:", error);
+		return null;
+	}
+});
+
+const signOut = createServerFn({ method: "POST" }).handler(async () => {
+	try {
+		setResponseHeader(
+			"Set-Cookie",
+			"session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/",
+		);
+		return { success: true };
+	} catch (error) {
+		console.error("Error signing out:", error);
+		throw new Error("Failed to sign out");
+	}
+});
 
 export {
 	getCategory,
@@ -941,7 +738,6 @@ export {
 	getCollections,
 	getProductCount,
 	getProductDetails,
-	getPrefetchImages,
 	getProductForSubcategory,
 	getProductsForSubcategory,
 	getRelatedProducts,
@@ -953,4 +749,6 @@ export {
 	addToCart,
 	removeFromCart,
 	searchProducts,
+	getUser,
+	signOut,
 };

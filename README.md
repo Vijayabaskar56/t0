@@ -37,13 +37,41 @@ A highly performant e-commerce template using TanStack and Cloudflare, inspired 
 
 - Run `wrangler login` to authenticate with Cloudflare.
 - Set up your environment variables in `.dev.vars` or use Cloudflare environment variables.
-- Run `pnpm install` && `pnpm dev` to start developing locally with Wrangler.
-- The original data includes 1,000,000+ products with full schema and unique images. To seed your D1 database:
-  - Import the data using `wrangler d1 execute tanstack-fast-db --file=data.sql` (if available)
-  - Or use the admin script: `pnpm db:admin` for database management
-- For DB migrations with `drizzle-kit`:
-  - Run `pnpm db:push` to apply schema to your D1 database
-  - Run `pnpm db:studio` to open Drizzle Studio for database inspection
+- Run `pnpm install` to install dependencies.
+
+#### Database Setup
+
+1. **Initialize Database Schema**
+   ```bash
+   pnpm run db:init
+   ```
+   This creates all necessary tables in your local D1 database.
+
+2. **Seed with Sample Data** (Recommended for contributors)
+   ```bash
+   pnpm run db:seed
+   ```
+   This populates the database with realistic sample data:
+   - 10 Collections
+   - 20 Categories  
+   - 15 Subcollections
+   - 30 Subcategories
+   - 500+ Products
+
+3. **Start Development**
+   ```bash
+   pnpm dev
+   ```
+
+#### Database Commands
+
+- `pnpm run db:init` - Initialize database schema
+- `pnpm run db:seed` - Seed with sample data
+- `pnpm run db:studio` - Open Drizzle Studio (database GUI)
+- `pnpm run db:generate` - Generate migrations
+- `pnpm run db:push` - Push schema changes
+
+**Note**: The database is automatically detected in `.wrangler/state/v3/d1/miniflare-D1DatabaseObject/` - no hardcoded paths, works for any contributor.
 
 ### Performance
 

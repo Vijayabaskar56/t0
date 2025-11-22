@@ -1,13 +1,14 @@
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { ErrorBoundary } from "./components/error-boundary";
-import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
+import { getContext } from "./integrations/tanstack-query/context";
+import { Provider } from "./integrations/tanstack-query/root-provider";
 import { SeenSetManager } from "./lib/seen-set-manager";
 import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
 export const getRouter = () => {
-	const rqContext = TanstackQuery.getContext();
+	const rqContext = getContext();
 	const seenManager = new SeenSetManager();
 
 	const router = createRouter({
@@ -17,16 +18,14 @@ export const getRouter = () => {
 		scrollRestoration: true,
 		defaultStructuralSharing: true,
 		scrollRestorationBehavior: "smooth",
+		defaultPreloadDelay: 0,
+		defaultPreloadIntentProximity: 150,
 		defaultNotFoundComponent: () => <div>Not Found</div>,
 		defaultErrorComponent: ({ error, reset }) => (
 			<ErrorBoundary error={error} reset={reset} />
 		),
 		Wrap: (props: { children: React.ReactNode }) => {
-			return (
-				<TanstackQuery.Provider {...rqContext}>
-					{props.children}
-				</TanstackQuery.Provider>
-			);
+			return <Provider {...rqContext}>{props.children}</Provider>;
 		},
 	});
 

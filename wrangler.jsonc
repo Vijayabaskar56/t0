@@ -11,6 +11,7 @@
 			"binding": "tanstack_fast_db",
 			"database_name": "tanstack-fast-db",
 			"database_id": "d83bd6b6-e112-4640-853b-d8cab86732ba",
+			"migrations_dir": "drizzle",
 			"remote": true
 		}
 	],

@@ -5,29 +5,30 @@ import {
 	getCategoryProductCount,
 	getCollectionDetails,
 	getCollections,
-	getPrefetchImages,
 	getProductCount,
 	getProductDetails,
 	getProductForSubcategory,
 	getProductsForSubcategory,
 	getRelatedProducts,
 	getSubCategoryProductCount,
+	getUser,
 	searchProducts,
 } from "./server-funtions";
 
 export const getCollectionsOptions = () =>
 	queryOptions({
 		queryKey: ["collections"],
-		queryFn: () => getCollections(),
+		queryFn: ({ signal }) => getCollections({ signal }),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getCollectionDetailsOptions = (collectionName: string) =>
 	queryOptions({
 		queryKey: ["collection-details", collectionName],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getCollectionDetails({
 				data: { collectionName },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -35,9 +36,10 @@ export const getCollectionDetailsOptions = (collectionName: string) =>
 export const getCategoryOptions = (category: string) =>
 	queryOptions({
 		queryKey: ["category", category],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getCategory({
 				data: { category },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -45,9 +47,10 @@ export const getCategoryOptions = (category: string) =>
 export const getCategoryProductCountOptions = (category: string) =>
 	queryOptions({
 		queryKey: ["category-product-count", category],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getCategoryProductCount({
 				data: { category },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -55,9 +58,10 @@ export const getCategoryProductCountOptions = (category: string) =>
 export const getProductForSubcategoryOptions = (subcategory: string) =>
 	queryOptions({
 		queryKey: ["product-for-subcategory", subcategory],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getProductForSubcategory({
 				data: { subcategory },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -65,9 +69,10 @@ export const getProductForSubcategoryOptions = (subcategory: string) =>
 export const getSubCategoryProductCountOptions = (subcategory: string) =>
 	queryOptions({
 		queryKey: ["subcategory-product-count", subcategory],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getSubCategoryProductCount({
 				data: { subcategory },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -75,9 +80,10 @@ export const getSubCategoryProductCountOptions = (subcategory: string) =>
 export const getProductDetailsOptions = (product: string) =>
 	queryOptions({
 		queryKey: ["product-details", product],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getProductDetails({
 				data: { product },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -85,9 +91,10 @@ export const getProductDetailsOptions = (product: string) =>
 export const getProductsForSubcategoryOptions = (subcategory: string) =>
 	queryOptions({
 		queryKey: ["products-for-subcategory", subcategory],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getProductsForSubcategory({
 				data: { subcategory },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -98,9 +105,10 @@ export const getRelatedProductsOptions = (
 ) =>
 	queryOptions({
 		queryKey: ["related-products", subcategory, currentProductSlug],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			getRelatedProducts({
 				data: { subcategory, currentProductSlug },
+				signal,
 			}),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
@@ -108,15 +116,15 @@ export const getRelatedProductsOptions = (
 export const getProductCountOptions = () =>
 	queryOptions({
 		queryKey: ["product-count"],
-		queryFn: () => getProductCount(),
+		queryFn: ({ signal }) => getProductCount({ signal }),
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 export const getCartOptions = () =>
 	queryOptions({
 		queryKey: ["cart-items"],
-		queryFn: () =>
-			fetch("/order").then((res) => res.json()) as Promise<{
+		queryFn: ({ signal }) =>
+			fetch("/order", { signal }).then((res) => res.json()) as Promise<{
 				products: (Product & { quantity: number })[];
 			}>,
 		staleTime: 1000 * 60 * 10, // 10 minutes
@@ -125,18 +133,18 @@ export const getCartOptions = () =>
 export const searchProductsOptions = (q: string) =>
 	queryOptions({
 		queryKey: ["search-products", q],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			searchProducts({
 				data: { q },
+				signal,
 			}),
 		enabled: q.length >= 2,
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
-export const prefetchImagesOptions = (path: string) =>
+export const getUserOptions = () =>
 	queryOptions({
-		queryKey: ["pre-fetch-images", path],
-		queryFn: () => getPrefetchImages({ data: { path } }),
-		enabled: typeof window !== "undefined",
-		staleTime: 1000 * 60 * 10, // 10 minutes
+		queryKey: ["user"],
+		queryFn: ({ signal }) => getUser({ signal }),
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});

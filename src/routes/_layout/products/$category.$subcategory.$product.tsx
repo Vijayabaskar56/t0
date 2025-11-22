@@ -1,13 +1,14 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Image } from "@unpic/react";
 import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
 import { AddToCartForm } from "@/components/add-to-cart-form";
-import { Image } from "@unpic/react";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
+import { getEagerImageCount } from "@/lib/get-eager-image-count";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute(
@@ -27,6 +28,7 @@ export const Route = createFileRoute(
 			const currentProduct = productData as unknown as Product;
 			const relatedProducts = relatedProductsData as unknown as Product[];
 
+			const eagerCount = getEagerImageCount();
 			let count = 0;
 			const images: PrefetchImage[] = [
 				currentProduct?.imageUrl
@@ -41,7 +43,7 @@ export const Route = createFileRoute(
 					.map((product) => ({
 						src: product.imageUrl ?? "/placeholder.webp",
 						alt: product.name,
-						loading: count++ < 15 ? "eager" : "lazy",
+						loading: count++ < eagerCount ? "eager" : "lazy",
 					})),
 			].filter(Boolean) as PrefetchImage[];
 

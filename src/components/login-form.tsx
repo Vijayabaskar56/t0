@@ -1,5 +1,6 @@
-import { useActionState, useId } from "react";
-import { signIn, signUp } from "@/api/server-funtions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useId } from "react";
+import { signIn, signOut, signUp } from "@/api/server-funtions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,16 +10,47 @@ import {
 } from "@/components/ui/popover";
 
 export function LoginForm() {
-	const [signInState, signInFormAction, signInPending] = useActionState<
-		ActionState,
-		FormData
-	>(signIn, { error: "" });
-	const [signUpState, signUpFormAction, signUpPending] = useActionState<
-		ActionState,
-		FormData
-	>(signUp, { error: "" });
-	const pending = signInPending || signUpPending;
-	const state = signInState.error ? signInState : signUpState;
+	const queryClient = useQueryClient();
+
+	const signInMutation = useMutation({
+		mutationFn: (data: { username: string; password: string }) =>
+			signIn({ data }),
+		onSuccess: (result) => {
+			if (!result.error) {
+				queryClient.invalidateQueries({ queryKey: ["user"] });
+			}
+		},
+	});
+
+	const signUpMutation = useMutation({
+		mutationFn: (data: { username: string; password: string }) =>
+			signUp({ data }),
+		onSuccess: (result) => {
+			if (!result.error) {
+				queryClient.invalidateQueries({ queryKey: ["user"] });
+			}
+		},
+	});
+
+	const handleSignIn = (formData: FormData) => {
+		const username = formData.get("username") as string;
+		const password = formData.get("password") as string;
+		signInMutation.mutate({ username, password });
+	};
+
+	const handleSignUp = (formData: FormData) => {
+		const username = formData.get("username") as string;
+		const password = formData.get("password") as string;
+		signUpMutation.mutate({ username, password });
+	};
+
+	const error =
+		signInMutation.data?.error ||
+		signUpMutation.data?.error ||
+		(signInMutation.isError ? "Failed to sign in" : null) ||
+		(signUpMutation.isError ? "Failed to sign up" : null);
+
+	const isLoading = signInMutation.isPending || signUpMutation.isPending;
 
 	return (
 		<form className="flex flex-col space-y-6">
@@ -55,27 +87,37 @@ export function LoginForm() {
 				</div>
 
 				<Button
-					type="submit"
-					className="rounded-[1px] bg-accent1 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-accent1 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
-					disabled={pending}
-					formAction={signInFormAction}
+					type="button"
+					className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
+					disabled={isLoading}
+					onClick={(e) => {
+						e.preventDefault();
+						const form = e.currentTarget.form;
+						if (form) {
+							handleSignIn(new FormData(form));
+						}
+					}}
 				>
 					{"Log in"}
 				</Button>
 
 				<Button
-					type="submit"
-					variant={"ghost"}
+					type="button"
+					variant={"link"}
 					className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
-					disabled={pending}
-					formAction={signUpFormAction}
+					disabled={isLoading}
+					onClick={(e) => {
+						e.preventDefault();
+						const form = e.currentTarget.form;
+						if (form) {
+							handleSignUp(new FormData(form));
+						}
+					}}
 				>
 					{"Create login"}
 				</Button>
 			</div>
-			{state?.error && (
-				<div className="text-sm text-red-500">{state.error}</div>
-			)}
+			{error && <div className="text-sm text-red-500">{error}</div>}
 		</form>
 	);
 }
@@ -98,6 +140,17 @@ export function SignInSignUp() {
 }
 
 export function SignOut(props: { username: string }) {
+	const queryClient = useQueryClient();
+
+	const signOutMutation = useMutation({
+		mutationFn: () => signOut(),
+		onSuccess: (result) => {
+			if (result.success) {
+				queryClient.invalidateQueries({ queryKey: ["user"] });
+			}
+		},
+	});
+
 	return (
 		<Popover>
 			<PopoverTrigger className="flex flex-row items-center gap-1">
@@ -107,15 +160,15 @@ export function SignOut(props: { username: string }) {
 				</svg>
 			</PopoverTrigger>
 			<PopoverContent className="flex w-32 flex-col items-center px-8 py-4">
-				<form>
-					<Button
-						// formAction={signOut}
-						variant={"ghost"}
-						className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
-					>
-						{"Sign Out"}
-					</Button>
-				</form>
+				<Button
+					type="button"
+					variant={"ghost"}
+					className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
+					disabled={signOutMutation.isPending}
+					onClick={() => signOutMutation.mutate()}
+				>
+					{"Sign Out"}
+				</Button>
 			</PopoverContent>
 		</Popover>
 	);

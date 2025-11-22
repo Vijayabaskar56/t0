@@ -6,6 +6,7 @@ import {
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
+import { getEagerImageCount } from "@/lib/get-eager-image-count";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 import { seo } from "@/lib/seo";
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute(
 				getProductForSubcategoryOptions(params.subcategory),
 			)) as unknown as Product[];
 
+			const eagerCount = getEagerImageCount();
 			let count = 0;
 			const images: PrefetchImage[] =
 				productsData
@@ -29,7 +31,7 @@ export const Route = createFileRoute(
 					.map((product) => ({
 						src: product.imageUrl ?? "/placeholder.webp",
 						alt: product.name,
-						loading: count++ < 15 ? "eager" : "lazy",
+						loading: count++ < eagerCount ? "eager" : "lazy",
 					})) ?? [];
 
 			prefetchImages(images, context.seenManager);

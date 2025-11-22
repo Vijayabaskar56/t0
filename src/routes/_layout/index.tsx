@@ -4,8 +4,8 @@ import {
 	getCollectionsOptions,
 	getProductCountOptions,
 } from "@/api/query-options";
-// import { Image } from "@/components/ui/image";
 import type { Category, Collection } from "@/db/schema";
+import { getEagerImageCount } from "@/lib/get-eager-image-count";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 import { seo } from "@/lib/seo";
 
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_layout/")({
 				getCollectionsOptions(),
 			)) as (Collection & { categories: Category[] })[];
 
+			const eagerCount = getEagerImageCount();
 			let count = 0;
 			const images: PrefetchImage[] = collections.flatMap(
 				(collection: Collection & { categories: Category[] }) =>
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/_layout/")({
 						.map((cat: Category) => ({
 							src: cat.imageUrl ?? "/placeholder.webp",
 							alt: cat.name,
-							loading: count++ < 15 ? "eager" : "lazy",
+							loading: count++ < eagerCount ? "eager" : "lazy",
 						})),
 			);
 

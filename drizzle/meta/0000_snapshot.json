@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f1c3f6e7-ca25-4b70-ae94-db0ebb8a2834",
+  "id": "8a05c793-d626-4bab-b2c5-5202c9f7d20c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -148,6 +148,13 @@
             "subcategory_slug"
           ],
           "isUnique": false
+        },
+        "products_name_idx": {
+          "name": "products_name_idx",
+          "columns": [
+            "name COLLATE NOCASE"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -165,6 +172,30 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "products_fts": {
+      "name": "products_fts",
+      "columns": {
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -346,6 +377,14 @@
     "columns": {}
   },
   "internal": {
-    "indexes": {}
+    "indexes": {
+      "products_name_idx": {
+        "columns": {
+          "name COLLATE NOCASE": {
+            "isExpression": true
+          }
+        }
+      }
+    }
   }
 }

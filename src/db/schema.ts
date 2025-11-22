@@ -70,6 +70,12 @@ export const products = sqliteTable(
 	],
 );
 
+// // Products FTS: virtual table for full-text search (created via migration)
+export const productsFts = sqliteTable("products_fts", {
+	slug: text("slug").notNull(),
+	name: text("name").notNull(),
+});
+
 // Users: ID-based primary key (auto-increment)
 export const users = sqliteTable("users", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),

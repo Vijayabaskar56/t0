@@ -1,12 +1,12 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createMiddleware } from "@tanstack/react-start";
 import { getCookie, setResponseHeader } from "@tanstack/react-start/server";
-import { X } from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
-import z from "zod";
 import { Image } from "@unpic/react";
-import { OptimisticLink } from "@/components/ui/link";
+import { X } from "lucide-react";
+import { Suspense, useMemo } from "react";
+import z from "zod";
+import PlaceOrderAuth from "@/components/auth-component";
 import { db } from "@/db";
 import type { Product } from "@/db/schema";
 
@@ -267,13 +267,13 @@ export const Route = createFileRoute("/order/")({
 });
 
 function RouteComponent() {
-	const [totalCost, setTotalCost] = useState(0);
 	const { data: cart } = useSuspenseQuery({
 		queryKey: ["order-cart"],
 		queryFn: () => fetch("/order").then((res) => res.json()),
 	});
-	useEffect(() => {
-		setTotalCost(
+
+	const totalCost = useMemo(
+		() =>
 			(
 				cart as { products: { quantity: number; price: string }[] }
 			)?.products?.reduce<number>(
@@ -281,8 +281,8 @@ function RouteComponent() {
 					acc + (item.quantity ?? 0) * Number(item.price),
 				0,
 			) ?? 0,
-		);
-	}, [cart]);
+		[cart],
+	);
 
 	return (
 		<div className="flex mx-auto flex-col gap-6 pt-4 lg:grid lg:grid-cols-3 lg:gap-8">
@@ -309,9 +309,9 @@ function RouteComponent() {
 						Applicable shipping and tax will be added.
 					</p>
 				</div>
-				{/* <Suspense>
-                <PlaceOrderAuth />
-              </Suspense> */}
+				<Suspense>
+					<PlaceOrderAuth />
+				</Suspense>
 			</div>
 		</div>
 	);
@@ -382,8 +382,9 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 
 	return (
 		<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-gray-200 pt-4 gap-4">
-			<OptimisticLink
+			<Link
 				to="/products/$category/$subcategory/$product"
+				preload="intent"
 				params={{
 					category: product.subcategorySlug,
 					subcategory: product.subcategorySlug,
@@ -392,7 +393,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 				className="flex-1"
 			>
 				<div className="flex flex-row space-x-3 sm:space-x-4">
-					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 flex-shrink-0">
+					<div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center bg-gray-100 shrink-0">
 						<Image
 							loading="eager"
 							decoding="sync"
@@ -423,7 +424,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 						</p>
 					</div>
 				</div>
-			</OptimisticLink>
+			</Link>
 			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
 				<div className="flex items-center gap-2 order-2 sm:order-1">
 					<button

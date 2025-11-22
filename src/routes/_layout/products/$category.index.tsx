@@ -6,6 +6,7 @@ import {
 	getCategoryProductCountOptions,
 } from "@/api/query-options";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
+import { getEagerImageCount } from "@/lib/get-eager-image-count";
 import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
 
 interface CategoryData extends Category {
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/_layout/products/$category/")({
 				getCategoryOptions(params.category),
 			)) as unknown as CategoryData;
 
+			const eagerCount = getEagerImageCount();
 			let count = 0;
 			const images: PrefetchImage[] =
 				categoryData?.subcollections?.flatMap((subcollection) =>
@@ -33,7 +35,7 @@ export const Route = createFileRoute("/_layout/products/$category/")({
 						.map((subcat) => ({
 							src: subcat.imageUrl ?? "/placeholder.webp",
 							alt: subcat.name,
-							loading: count++ < 15 ? "eager" : "lazy",
+							loading: count++ < eagerCount ? "eager" : "lazy",
 						})),
 				) ?? [];
 
@@ -41,8 +43,6 @@ export const Route = createFileRoute("/_layout/products/$category/")({
 		}
 	},
 	loader: async ({ params, context }) => {
-		// Fire-and-forget image prefetch
-
 		await Promise.all([
 			context.queryClient.ensureQueryData(getCategoryOptions(params.category)),
 			context.queryClient.ensureQueryData(

@@ -24,6 +24,12 @@ CREATE TABLE `products` (
 );
 --> statement-breakpoint
 CREATE INDEX `products_subcategory_slug_idx` ON `products` (`subcategory_slug`);--> statement-breakpoint
+CREATE INDEX `products_name_idx` ON `products` (name COLLATE NOCASE);--> statement-breakpoint
+CREATE TABLE `products_fts` (
+	`slug` text NOT NULL,
+	`name` text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `subcategories` (
 	`slug` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,

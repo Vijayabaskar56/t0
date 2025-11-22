@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { or, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
 	categories,
 	products,
+	productsFts,
 	subcategories,
 	subcollections,
 } from "@/db/schema";
@@ -34,7 +35,7 @@ export const Route = createFileRoute("/search/")({
 						let data: SearchResult;
 
 						if (q.length <= 2) {
-							// Short search term: prefix matching
+							// Short search term: prefix matching with index
 							data = await db
 								.select({
 									slug: products.slug,
@@ -62,22 +63,7 @@ export const Route = createFileRoute("/search/")({
 								.orderBy(sql`${products.name} ASC`)
 								.limit(5);
 						} else {
-							// Longer search term: multi-word matching
-							const searchWords = q
-								.split(" ")
-								.filter((term) => term.trim() !== "")
-								.map((word) => `%${word}%`);
-
-							// Return empty results if no valid search words
-							if (searchWords.length === 0) {
-								return Response.json([]);
-							}
-
-							// Build OR conditions for each word
-							const conditions = searchWords.map(
-								(word) => sql`LOWER(${products.name}) LIKE LOWER(${word})`,
-							);
-
+							// Longer search term: FTS with relevance ranking
 							data = await db
 								.select({
 									slug: products.slug,
@@ -88,8 +74,12 @@ export const Route = createFileRoute("/search/")({
 									imageUrl: products.imageUrl,
 									categorySlug: categories.slug,
 								})
-								.from(products)
-								.where(or(...conditions))
+								.from(productsFts)
+								.where(sql`${productsFts} MATCH ${q}`)
+								.innerJoin(
+									products,
+									sql`${products.slug} = ${productsFts.slug}`,
+								)
 								.innerJoin(
 									subcategories,
 									sql`${products.subcategorySlug} = ${subcategories.slug}`,
@@ -102,7 +92,7 @@ export const Route = createFileRoute("/search/")({
 									categories,
 									sql`${subcollections.categorySlug} = ${categories.slug}`,
 								)
-								.orderBy(sql`${products.name} ASC`)
+								.orderBy(sql`bm25(${productsFts})`)
 								.limit(5);
 						}
 

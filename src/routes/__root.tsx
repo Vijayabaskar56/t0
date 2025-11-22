@@ -1,4 +1,3 @@
-import "../styles.css";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -8,18 +7,22 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Image } from "@unpic/react";
 import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
+import PlaceOrderAuth from "@/components/auth-component";
 import CartCount from "@/components/cart-count";
-import { Image } from "@unpic/react";
 import { WelcomeToast } from "@/components/welcome-toast";
 import type { SeenSetManager } from "@/lib/seen-set-manager";
 import { seo } from "@/lib/seo";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+import "../styles.css";
 
 const SearchDropdownComponent = lazy(
 	() => import("@/components/search-dropdown"),
 );
+
+const AuthComponent = lazy(() => import("@/components/auth-component"));
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -61,14 +64,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<div>
 					<header className="fixed top-0 z-10 flex h-[90px] w-screen grow items-center justify-between border-b-2 border-accent2 bg-background p-2 pb-1 pt-2 sm:h-[70px] sm:flex-row sm:gap-4 sm:p-4 sm:pb-1 sm:pt-0">
 						<div className="flex grow flex-col">
-							<div className="absolute right-2 top-2 flex justify-end pt-2 font-sans text-sm hover:underline sm:relative sm:right-0 sm:top-0"></div>
+							<div
+								className="absolute md:right-2 md:top-4 w-full flex justify-end flex-end
+							 pt-2 font-sans text-sm hover:underline sm:relative sm:right-0 sm:top-0"
+							>
+								<Suspense
+									fallback={
+										<div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
+									}
+								>
+									<PlaceOrderAuth />
+								</Suspense>
+							</div>
 							<div className="flex w-full flex-col items-start justify-center sm:w-auto sm:flex-row sm:items-center sm:gap-2">
 								<Link
 									to="/"
 									className="text-2xl font-bold text-accent1"
 									preload="intent"
 								>
-									<span className="flex flex-row gap-2">
+									<span className="flex flex-row gap-2 pb-4">
 										<Image
 											src="/logo-black.svg"
 											alt="logo"
