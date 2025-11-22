@@ -3,7 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { jwtVerify, SignJWT } from "jose";
 import type { NewUser } from "@/db/schema";
 
-const key = new TextEncoder().encode(process.env.AUTH_SECRET);
+const key = new TextEncoder().encode(import.meta.env.AUTH_SECRET);
 const SALT_ROUNDS = 10;
 
 export async function hashPassword(password: string) {
