@@ -1,36 +1,20 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import { getCollectionDetailsOptions } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import type { Category, Collection } from "@/db/schema";
-import { getEagerImageCount } from "@/lib/get-eager-image-count";
-import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
+import { prefetchCollectionImages } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute("/_layout/$collectionName")({
-	beforeLoad: async ({ params, context }) => {
-		if (typeof window !== "undefined") {
-			const collectionDetails = (await context.queryClient.ensureQueryData(
-				getCollectionDetailsOptions(params.collectionName),
-			)) as unknown as (Collection & { categories: Category[] })[];
-
-			const eagerCount = getEagerImageCount();
-			let count = 0;
-			const images: PrefetchImage[] =
-				collectionDetails?.[0]?.categories
-					?.filter((cat) => cat.imageUrl)
-					.map((cat) => ({
-						src: cat.imageUrl ?? "/placeholder.webp",
-						alt: cat.name,
-						loading: count++ < eagerCount ? "eager" : "lazy",
-					})) ?? [];
-
-			prefetchImages(images, context.seenManager);
-		}
-	},
 	loader: async ({ params, context }) => {
-		return await context.queryClient.ensureQueryData(
+		const collectionDetails = await context.queryClient.ensureQueryData(
 			getCollectionDetailsOptions(params.collectionName),
 		);
+
+		// Fire-and-forget image prefetching
+		prefetchCollectionImages(collectionDetails, context.seenManager);
+
+		return collectionDetails;
 	},
 	head: () => ({
 		meta: [
@@ -86,18 +70,7 @@ function RouteComponent() {
 								className="mb-2 h-14 w-14 border hover:bg-accent2"
 								width={48}
 								height={48}
-								options={{
-									cloudflare: {
-										domain: "images.tancn.dev",
-									},
-								}}
-								operations={{
-									cloudflare: {
-										width: 48,
-										height: 48,
-										quality: 60,
-									},
-								}}
+								quality={65}
 							/>
 							<span className="text-xs">{category.name}</span>
 						</Link>

@@ -6,8 +6,7 @@ import {
 } from "@/api/query-options";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
-import { getEagerImageCount } from "@/lib/get-eager-image-count";
-import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
+import { prefetchSubcategoryImages } from "@/lib/prefetch-images";
 import { seo } from "@/lib/seo";
 
 interface ProductCountData {
@@ -17,28 +16,8 @@ interface ProductCountData {
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/",
 )({
-	beforeLoad: async ({ params, context }) => {
-		if (typeof window !== "undefined") {
-			const productsData = (await context.queryClient.ensureQueryData(
-				getProductForSubcategoryOptions(params.subcategory),
-			)) as unknown as Product[];
-
-			const eagerCount = getEagerImageCount();
-			let count = 0;
-			const images: PrefetchImage[] =
-				productsData
-					?.filter((product) => product.imageUrl)
-					.map((product) => ({
-						src: product.imageUrl ?? "/placeholder.webp",
-						alt: product.name,
-						loading: count++ < eagerCount ? "eager" : "lazy",
-					})) ?? [];
-
-			prefetchImages(images, context.seenManager);
-		}
-	},
 	loader: async ({ params, context }) => {
-		await Promise.all([
+		const [productsData] = await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductForSubcategoryOptions(params.subcategory),
 			),
@@ -46,6 +25,9 @@ export const Route = createFileRoute(
 				getSubCategoryProductCountOptions(params.subcategory),
 			),
 		]);
+
+		// Fire-and-forget image prefetching
+		prefetchSubcategoryImages(productsData, context.seenManager);
 	},
 	head: ({ params }) => {
 		return {

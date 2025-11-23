@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import {
 	getCollectionsOptions,
 	getProductCountOptions,
 } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import type { Category, Collection } from "@/db/schema";
-import { getEagerImageCount } from "@/lib/get-eager-image-count";
-import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
+import { prefetchCollectionsImages } from "@/lib/prefetch-images";
 import { seo } from "@/lib/seo";
 
 interface LayoutLoaderData {
@@ -15,33 +14,17 @@ interface LayoutLoaderData {
 }
 
 export const Route = createFileRoute("/_layout/")({
-	beforeLoad: async ({ context }) => {
-		if (typeof window !== "undefined") {
-			const collections = (await context.queryClient.ensureQueryData(
-				getCollectionsOptions(),
-			)) as (Collection & { categories: Category[] })[];
-
-			const eagerCount = getEagerImageCount();
-			let count = 0;
-			const images: PrefetchImage[] = collections.flatMap(
-				(collection: Collection & { categories: Category[] }) =>
-					collection.categories
-						.filter((cat: Category) => cat.imageUrl)
-						.map((cat: Category) => ({
-							src: cat.imageUrl ?? "/placeholder.webp",
-							alt: cat.name,
-							loading: count++ < eagerCount ? "eager" : "lazy",
-						})),
-			);
-
-			prefetchImages(images, context.seenManager);
-		}
-	},
 	loader: async ({ context }) => {
 		const [collections, productCount] = await Promise.all([
 			context.queryClient.ensureQueryData(getCollectionsOptions()),
 			context.queryClient.ensureQueryData(getProductCountOptions()),
 		]);
+
+		prefetchCollectionsImages(
+			collections as (Collection & { categories: Category[] })[],
+			context.seenManager,
+		);
+
 		return { collections, productCount };
 	},
 	head: ({ loaderData }) => {
@@ -99,18 +82,7 @@ function RouteComponent() {
 										className="mb-2 h-14 w-14 border hover:bg-accent2"
 										width={48}
 										height={48}
-										options={{
-											cloudflare: {
-												domain: "images.tancn.dev",
-											},
-										}}
-										operations={{
-											cloudflare: {
-												width: 48,
-												height: 48,
-												quality: 60,
-											},
-										}}
+										quality={65}
 									/>
 									<span className="text-xs">{category.name}</span>
 								</Link>

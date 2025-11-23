@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/db/schema";
-import { Image } from "@unpic/react";
+import { Image } from "./image";
+// import { Image } from "@unpic/react";
 
 export function ProductLink(props: {
 	imageUrl?: string | null;
@@ -30,19 +31,8 @@ export function ProductLink(props: {
 					alt={`A small picture of ${product.name}`}
 					width={48}
 					height={48}
+					quality={60}
 					className="h-auto w-12 shrink-0 object-cover"
-					options={{
-						cloudflare: {
-							domain: "images.tancn.dev",
-						},
-					}}
-					operations={{
-						cloudflare: {
-							width: 48,
-							height: 48,
-							quality: props.quality ?? 65,
-						},
-					}}
 				/>
 			</div>
 			<div className="px-2" />

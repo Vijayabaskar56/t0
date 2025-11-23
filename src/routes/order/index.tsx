@@ -2,11 +2,11 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createMiddleware } from "@tanstack/react-start";
 import { getCookie, setResponseHeader } from "@tanstack/react-start/server";
-import { Image } from "@unpic/react";
 import { X } from "lucide-react";
 import { Suspense, useMemo } from "react";
 import z from "zod";
 import PlaceOrderAuth from "@/components/auth-component";
+import { Image } from "@/components/ui/image";
 import { db } from "@/db";
 import type { Product } from "@/db/schema";
 
@@ -401,18 +401,7 @@ function CartItem({ product }: { product: Product & { quantity: number } }) {
 							alt="Product"
 							width={256}
 							height={256}
-							options={{
-								cloudflare: {
-									domain: "images.tancn.dev",
-								},
-							}}
-							operations={{
-								cloudflare: {
-									width: 256,
-									height: 256,
-									quality: 65,
-								},
-							}}
+							quality={65}
 						/>
 					</div>
 					<div className="flex-1 min-w-0">

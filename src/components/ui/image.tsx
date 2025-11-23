@@ -29,7 +29,7 @@ export function Image({
 		if (!isR2Image) return src;
 		// Use Cloudflare Image Resizing for R2 images
 		return import.meta.env.DEV
-			? src
+			? `https://images.tancn.dev/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`
 			: `/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`;
 	};
 

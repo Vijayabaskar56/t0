@@ -3,6 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { jwtVerify, SignJWT } from "jose";
 import type { NewUser } from "@/db/schema";
 import type { RequestContext } from "@/server";
+
 const SALT_ROUNDS = 10;
 
 function getAuthKey(context?: RequestContext) {

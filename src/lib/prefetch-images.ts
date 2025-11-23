@@ -1,3 +1,6 @@
+import { createIsomorphicFn } from "@tanstack/react-start";
+import type { Category, Collection } from "@/db/schema";
+import { getEagerImageCount } from "./get-eager-image-count";
 import type { SeenSetManager } from "./seen-set-manager";
 
 export type PrefetchImage = {
@@ -6,6 +9,109 @@ export type PrefetchImage = {
 	sizes?: string | null;
 	loading?: string;
 };
+
+export const prefetchCollectionsImages = createIsomorphicFn().client(
+	async (
+		collections: (Collection & { categories: Category[] })[],
+		seenManager: SeenSetManager,
+	) => {
+		const eagerCount = getEagerImageCount();
+		let count = 0;
+		const images: PrefetchImage[] = collections.flatMap((collection) =>
+			collection.categories
+				.filter((cat) => cat.imageUrl)
+				.map((cat) => ({
+					src: cat.imageUrl ?? "/placeholder.webp",
+					alt: cat.name,
+					loading: count++ < eagerCount ? "eager" : "lazy",
+				})),
+		);
+
+		prefetchImages(images, seenManager);
+	},
+);
+
+export const prefetchCategoryImages = createIsomorphicFn().client(
+	async (categoryData: any, seenManager: SeenSetManager) => {
+		const eagerCount = getEagerImageCount();
+		let count = 0;
+		const images: PrefetchImage[] =
+			categoryData?.subcollections?.flatMap((subcollection: any) =>
+				subcollection.subcategories
+					.filter((subcat: any) => subcat.imageUrl)
+					.map((subcat: any) => ({
+						src: subcat.imageUrl ?? "/placeholder.webp",
+						alt: subcat.name,
+						loading: count++ < eagerCount ? "eager" : "lazy",
+					})),
+			) ?? [];
+
+		prefetchImages(images, seenManager);
+	},
+);
+
+export const prefetchProductImages = createIsomorphicFn().client(
+	async (
+		currentProduct: any,
+		relatedProducts: any[],
+		seenManager: SeenSetManager,
+	) => {
+		const eagerCount = getEagerImageCount();
+		let count = 0;
+		const images: PrefetchImage[] = [
+			currentProduct?.imageUrl
+				? {
+						src: currentProduct.imageUrl,
+						alt: currentProduct.name,
+						loading: "eager",
+					}
+				: null,
+			...relatedProducts
+				.filter((p) => p.imageUrl && p.slug !== currentProduct?.slug)
+				.map((product) => ({
+					src: product.imageUrl ?? "/placeholder.webp",
+					alt: product.name,
+					loading: count++ < eagerCount ? "eager" : "lazy",
+				})),
+		].filter(Boolean) as PrefetchImage[];
+
+		prefetchImages(images, seenManager);
+	},
+);
+
+export const prefetchCollectionImages = createIsomorphicFn().client(
+	async (collectionDetails: any, seenManager: SeenSetManager) => {
+		const eagerCount = getEagerImageCount();
+		let count = 0;
+		const images: PrefetchImage[] =
+			collectionDetails?.[0]?.categories
+				?.filter((cat: any) => cat.imageUrl)
+				.map((cat: any) => ({
+					src: cat.imageUrl ?? "/placeholder.webp",
+					alt: cat.name,
+					loading: count++ < eagerCount ? "eager" : "lazy",
+				})) ?? [];
+
+		prefetchImages(images, seenManager);
+	},
+);
+
+export const prefetchSubcategoryImages = createIsomorphicFn().client(
+	async (productsData: any, seenManager: SeenSetManager) => {
+		const eagerCount = getEagerImageCount();
+		let count = 0;
+		const images: PrefetchImage[] =
+			productsData
+				?.filter((product: any) => product.imageUrl)
+				.map((product: any) => ({
+					src: product.imageUrl ?? "/placeholder.webp",
+					alt: product.name,
+					loading: count++ < eagerCount ? "eager" : "lazy",
+				})) ?? [];
+
+		prefetchImages(images, seenManager);
+	},
+);
 
 export function prefetchImages(
 	images: PrefetchImage[] | undefined,

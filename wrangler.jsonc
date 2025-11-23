@@ -5,6 +5,9 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
+	"placement": {
+    "mode": "smart"
+  },
 	"main" : "./src/server.ts",
 	"d1_databases": [
 		{

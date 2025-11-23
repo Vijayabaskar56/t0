@@ -1,9 +1,9 @@
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { faker } from "@faker-js/faker";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as schema from "../db/schema.ts";
-import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 
 // Find the D1 database dynamically
 function findD1DatabasePath(): string {

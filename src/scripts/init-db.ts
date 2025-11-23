@@ -1,6 +1,6 @@
-import Database from "better-sqlite3";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import Database from "better-sqlite3";
 
 // Find the D1 database dynamically
 function findD1DatabasePath(): string {

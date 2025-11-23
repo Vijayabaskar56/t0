@@ -1,13 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import {
 	getCategoryOptions,
 	getCategoryProductCountOptions,
 } from "@/api/query-options";
+import { Image } from "@/components/ui/image";
 import type { Category, Subcategory, Subcollection } from "@/db/schema";
-import { getEagerImageCount } from "@/lib/get-eager-image-count";
-import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
+import { prefetchCategoryImages } from "@/lib/prefetch-images";
 
 interface CategoryData extends Category {
 	subcollections: (Subcollection & {
@@ -20,35 +19,16 @@ interface ProductCountData {
 }
 
 export const Route = createFileRoute("/_layout/products/$category/")({
-	beforeLoad: async ({ context, params }) => {
-		if (typeof window !== "undefined") {
-			const categoryData = (await context.queryClient.ensureQueryData(
-				getCategoryOptions(params.category),
-			)) as unknown as CategoryData;
-
-			const eagerCount = getEagerImageCount();
-			let count = 0;
-			const images: PrefetchImage[] =
-				categoryData?.subcollections?.flatMap((subcollection) =>
-					subcollection.subcategories
-						.filter((subcat) => subcat.imageUrl)
-						.map((subcat) => ({
-							src: subcat.imageUrl ?? "/placeholder.webp",
-							alt: subcat.name,
-							loading: count++ < eagerCount ? "eager" : "lazy",
-						})),
-				) ?? [];
-
-			prefetchImages(images, context.seenManager);
-		}
-	},
 	loader: async ({ params, context }) => {
-		await Promise.all([
+		const [categoryData] = await Promise.all([
 			context.queryClient.ensureQueryData(getCategoryOptions(params.category)),
 			context.queryClient.ensureQueryData(
 				getCategoryProductCountOptions(params.category),
 			),
 		]);
+
+		// Fire-and-forget image prefetching
+		prefetchCategoryImages(categoryData, context.seenManager);
 	},
 	component: RouteComponent,
 	head: () => ({
@@ -112,18 +92,7 @@ function RouteComponent() {
 											width={48}
 											height={48}
 											className="h-12 w-12 shrink-0 object-cover"
-											options={{
-												cloudflare: {
-													domain: "images.tancn.dev",
-												},
-											}}
-											operations={{
-												cloudflare: {
-													width: 48,
-													height: 48,
-													quality: 60,
-												},
-											}}
+											quality={65}
 										/>
 									</div>
 									<div className="flex h-16 grow flex-col items-start py-2">

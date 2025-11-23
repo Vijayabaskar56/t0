@@ -1,58 +1,21 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import {
 	getProductDetailsOptions,
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
 import { AddToCartForm } from "@/components/add-to-cart-form";
+import { Image } from "@/components/ui/image";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
-import { getEagerImageCount } from "@/lib/get-eager-image-count";
-import { type PrefetchImage, prefetchImages } from "@/lib/prefetch-images";
+import { prefetchProductImages } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute(
 	"/_layout/products/$category/$subcategory/$product",
 )({
-	beforeLoad: async ({ params, context }) => {
-		if (typeof window !== "undefined") {
-			const [productData, relatedProductsData] = await Promise.all([
-				context.queryClient.ensureQueryData(
-					getProductDetailsOptions(params.product),
-				),
-				context.queryClient.ensureQueryData(
-					getProductsForSubcategoryOptions(params.subcategory),
-				),
-			]);
-
-			const currentProduct = productData as unknown as Product;
-			const relatedProducts = relatedProductsData as unknown as Product[];
-
-			const eagerCount = getEagerImageCount();
-			let count = 0;
-			const images: PrefetchImage[] = [
-				currentProduct?.imageUrl
-					? {
-							src: currentProduct.imageUrl,
-							alt: currentProduct.name,
-							loading: "eager",
-						}
-					: null,
-				...relatedProducts
-					.filter((p) => p.imageUrl && p.slug !== params.product)
-					.map((product) => ({
-						src: product.imageUrl ?? "/placeholder.webp",
-						alt: product.name,
-						loading: count++ < eagerCount ? "eager" : "lazy",
-					})),
-			].filter(Boolean) as PrefetchImage[];
-
-			prefetchImages(images, context.seenManager);
-		}
-	},
 	component: RouteComponent,
 	loader: async ({ params, context }) => {
-		await Promise.all([
+		const [productData, relatedProductsData] = await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductDetailsOptions(params.product),
 			),
@@ -60,6 +23,13 @@ export const Route = createFileRoute(
 				getProductsForSubcategoryOptions(params.subcategory),
 			),
 		]);
+
+		// Fire-and-forget image prefetching
+		prefetchProductImages(
+			productData,
+			relatedProductsData,
+			context.seenManager,
+		);
 	},
 	head: () => {
 		return {
@@ -111,18 +81,7 @@ function RouteComponent() {
 						height={256}
 						width={256}
 						className="h-56 w-56 shrink-0 border-2 md:h-64 md:w-64"
-						options={{
-							cloudflare: {
-								domain: "images.tancn.dev",
-							},
-						}}
-						operations={{
-							cloudflare: {
-								width: 256,
-								height: 256,
-								quality: 60,
-							},
-						}}
+						quality={65}
 					/>
 					<p className="grow text-base">{currentProduct?.description}</p>
 				</div>

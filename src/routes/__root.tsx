@@ -7,11 +7,11 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { Image } from "@unpic/react";
 import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
 import PlaceOrderAuth from "@/components/auth-component";
 import CartCount from "@/components/cart-count";
+import { Image } from "@/components/ui/image";
 import { WelcomeToast } from "@/components/welcome-toast";
 import type { SeenSetManager } from "@/lib/seen-set-manager";
 import { seo } from "@/lib/seo";
@@ -88,18 +88,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 											alt="logo"
 											height={40}
 											width={40}
-											options={{
-												cloudflare: {
-													domain: "images.tancn.dev",
-												},
-											}}
-											operations={{
-												cloudflare: {
-													width: 40,
-													height: 40,
-													quality: 60,
-												},
-											}}
+											quality={65}
 										/>
 										TanStack Start Faster
 									</span>

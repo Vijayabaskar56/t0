@@ -36,5 +36,5 @@ function RouteComponent() {
 				</Suspense>
 			</div>
 		</main>
-	)
+	);
 }
