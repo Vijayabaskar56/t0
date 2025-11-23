@@ -66,13 +66,13 @@ function RouteComponent() {
 					<div key={collection.name}>
 						<h2 className="text-xl font-semibold">{collection.name}</h2>
 						<div className="flex flex-row flex-wrap justify-center gap-2 border-b-2 py-4 sm:justify-start">
-							{collection.categories.map((category: Category) => (
+							{collection.categories.map((category: Category, i) => (
 								<Link
 									key={category.name}
 									className="flex w-[125px] flex-col items-center text-center"
 									to="/products/$category"
 									params={{ category: category.slug }}
-									preload="intent"
+									preload={i++ < 15 ? "intent" : "viewport"}
 								>
 									<Image
 										loading={imageCount++ < 15 ? "eager" : "lazy"}

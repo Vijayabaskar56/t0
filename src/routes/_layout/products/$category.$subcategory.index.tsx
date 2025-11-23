@@ -74,8 +74,9 @@ function RouteComponent() {
 				<p>No products for this subcategory</p>
 			)}
 			<div className="flex flex-row flex-wrap gap-2">
-				{products.map((product) => (
+				{products.map((product, i) => (
 					<ProductLink
+						preload={i < 15 ? "viewport" : "intent"}
 						key={product.name}
 						loading={imageCount++ < 15 ? "eager" : "lazy"}
 						category_slug={category}

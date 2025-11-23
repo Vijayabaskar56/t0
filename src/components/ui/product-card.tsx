@@ -8,15 +8,17 @@ export function ProductLink(props: {
 	category_slug: string;
 	subcategory_slug: string;
 	loading: "eager" | "lazy";
+	preload: "intent" | "render" | "viewport";
 	product: Product;
 	quality?: number;
 }) {
-	const { category_slug, subcategory_slug, product, imageUrl } = props;
+	const { category_slug, subcategory_slug, product, imageUrl, preload } = props;
 
 	return (
 		<Link
 			className="group flex h-[130px] w-full flex-row border px-4 py-2 hover:bg-gray-100 sm:w-[250px]"
 			to="/products/$category/$subcategory/$product"
+			preload={preload}
 			params={{
 				category: category_slug,
 				subcategory: subcategory_slug,

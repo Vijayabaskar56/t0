@@ -35,13 +35,13 @@ function RouteComponent() {
 					Choose a Category
 				</h2>
 				<ul className="flex flex-col items-start justify-center">
-					{(allCollections as Collection[]).map((collection) => (
+					{(allCollections as Collection[]).map((collection, i) => (
 						<li key={collection.slug} className="w-full">
 							<Link
 								to="/$collectionName"
 								params={{ collectionName: collection.slug }}
 								className="block w-full py-1 text-xs text-gray-800 hover:bg-accent2 hover:underline"
-								preload="intent"
+								preload={i < 25 ? "viewport" : "intent"}
 							>
 								{collection.name}
 							</Link>
