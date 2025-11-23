@@ -1,6 +1,7 @@
 import { createIsomorphicFn } from "@tanstack/react-start";
 import type { Category, Collection } from "@/db/schema";
 import { getEagerImageCount } from "./get-eager-image-count";
+import { getOptimizedUrl } from "./image-optimization";
 import type { SeenSetManager } from "./seen-set-manager";
 
 export type PrefetchImage = {
@@ -8,6 +9,8 @@ export type PrefetchImage = {
 	srcset?: string | null;
 	sizes?: string | null;
 	loading?: string;
+	width?: number;
+	quality?: number;
 };
 
 export const prefetchCollectionsImages = createIsomorphicFn().client(
@@ -21,9 +24,11 @@ export const prefetchCollectionsImages = createIsomorphicFn().client(
 			collection.categories
 				.filter((cat) => cat.imageUrl)
 				.map((cat) => ({
-					src: cat.imageUrl ?? "/placeholder.webp",
+					src: getOptimizedUrl(cat.imageUrl ?? "/placeholder.webp", 48, 65),
 					alt: cat.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
+					width: 48,
+					quality: 65,
 				})),
 		);
 
@@ -40,9 +45,15 @@ export const prefetchCategoryImages = createIsomorphicFn().client(
 				subcollection.subcategories
 					.filter((subcat: any) => subcat.imageUrl)
 					.map((subcat: any) => ({
-						src: subcat.imageUrl ?? "/placeholder.webp",
+						src: getOptimizedUrl(
+							subcat.imageUrl ?? "/placeholder.webp",
+							48,
+							65,
+						),
 						alt: subcat.name,
 						loading: count++ < eagerCount ? "eager" : "lazy",
+						width: 48,
+						quality: 65,
 					})),
 			) ?? [];
 
@@ -61,17 +72,21 @@ export const prefetchProductImages = createIsomorphicFn().client(
 		const images: PrefetchImage[] = [
 			currentProduct?.imageUrl
 				? {
-						src: currentProduct.imageUrl,
+						src: getOptimizedUrl(currentProduct.imageUrl, 256, 65),
 						alt: currentProduct.name,
 						loading: "eager",
+						width: 256,
+						quality: 65,
 					}
 				: null,
 			...relatedProducts
 				.filter((p) => p.imageUrl && p.slug !== currentProduct?.slug)
 				.map((product) => ({
-					src: product.imageUrl ?? "/placeholder.webp",
+					src: getOptimizedUrl(product.imageUrl ?? "/placeholder.webp", 48, 60),
 					alt: product.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
+					width: 48,
+					quality: 60,
 				})),
 		].filter(Boolean) as PrefetchImage[];
 
@@ -87,9 +102,11 @@ export const prefetchCollectionImages = createIsomorphicFn().client(
 			collectionDetails?.[0]?.categories
 				?.filter((cat: any) => cat.imageUrl)
 				.map((cat: any) => ({
-					src: cat.imageUrl ?? "/placeholder.webp",
+					src: getOptimizedUrl(cat.imageUrl ?? "/placeholder.webp", 48, 65),
 					alt: cat.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
+					width: 48,
+					quality: 65,
 				})) ?? [];
 
 		prefetchImages(images, seenManager);
@@ -104,9 +121,11 @@ export const prefetchSubcategoryImages = createIsomorphicFn().client(
 			productsData
 				?.filter((product: any) => product.imageUrl)
 				.map((product: any) => ({
-					src: product.imageUrl ?? "/placeholder.webp",
+					src: getOptimizedUrl(product.imageUrl ?? "/placeholder.webp", 48, 60),
 					alt: product.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
+					width: 48,
+					quality: 60,
 				})) ?? [];
 
 		prefetchImages(images, seenManager);

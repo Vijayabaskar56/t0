@@ -1,4 +1,5 @@
 import type { ImgHTMLAttributes } from "react";
+import { getOptimizedSrcSet, getOptimizedUrl } from "@/lib/image-optimization";
 
 interface ImageProps
 	extends Omit<ImgHTMLAttributes<HTMLImageElement>, "srcSet"> {
@@ -22,24 +23,12 @@ export function Image({
 	blurDataURL,
 	...props
 }: ImageProps) {
-	// Apply Cloudflare optimization only to R2 images
-	const isR2Image = src.includes("images.tancn.dev");
-
-	const getOptimizedUrl = (w: number, q: number) => {
-		if (!isR2Image) return src;
-		// Use Cloudflare Image Resizing for R2 images
-		return import.meta.env.DEV
-			? `https://images.tancn.dev/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`
-			: `/cdn-cgi/image/width=${w},quality=${q},format=auto/${src}`;
-	};
-
-	const srcSet = isR2Image
-		? `${getOptimizedUrl(width, quality)} 1x, ${getOptimizedUrl(width * 2, quality)} 2x`
-		: undefined;
+	const optimizedUrl = getOptimizedUrl(src, width, quality);
+	const srcSet = getOptimizedSrcSet(src, width, quality);
 
 	return (
 		<img
-			src={getOptimizedUrl(width, quality)}
+			src={optimizedUrl}
 			srcSet={srcSet}
 			alt={alt}
 			width={width}
@@ -47,6 +36,20 @@ export function Image({
 			loading={loading}
 			decoding={decoding}
 			className={className}
+			// options={{
+			// 	cloudflare: {
+			// 		domain: "images.tancn.dev",
+			// 	},
+			// }}
+			// operations={{
+			// 	cloudflare: {
+			// 		width: width,
+			// 		quality: quality,
+			// 		height: height,
+			// 		blur: blurDataURL ? 10 : undefined,
+			// 		format: "auto",
+			// 	},
+			// }}
 			style={
 				blurDataURL
 					? {

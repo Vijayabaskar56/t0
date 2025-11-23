@@ -62,6 +62,7 @@ function RouteComponent() {
 	const productCount = productCountData as unknown as ProductCountData[];
 
 	const finalCount = productCount[0]?.count;
+	let imageCount = 0;
 
 	return (
 		<div className="container mx-auto p-4">
@@ -76,7 +77,7 @@ function RouteComponent() {
 				{products.map((product) => (
 					<ProductLink
 						key={product.name}
-						loading="eager"
+						loading={imageCount++ < 15 ? "eager" : "lazy"}
 						category_slug={category}
 						subcategory_slug={subcategory}
 						product={product}
