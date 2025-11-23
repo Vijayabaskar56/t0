@@ -27,7 +27,6 @@ export const Route = createFileRoute("/_layout/products/$category/")({
 			),
 		]);
 
-		// Fire-and-forget image prefetching
 		prefetchCategoryImages(categoryData, context.seenManager);
 	},
 	component: RouteComponent,

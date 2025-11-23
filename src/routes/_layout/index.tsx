@@ -72,7 +72,8 @@ function RouteComponent() {
 									className="flex w-[125px] flex-col items-center text-center"
 									to="/products/$category"
 									params={{ category: category.slug }}
-									preload={i++ < 15 ? "intent" : "viewport"}
+									preload={"intent"}
+									preloadDelay={50}
 								>
 									<Image
 										loading={imageCount++ < 15 ? "eager" : "lazy"}

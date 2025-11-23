@@ -369,7 +369,7 @@ const getProductDetails = createServerFn({ method: "GET" })
 			if (data) {
 				ctx.context?.waitUntil(
 					ctx.context.env.CACHE.put(cacheKey, JSON.stringify(data), {
-						expirationTtl: 3600,
+						expirationTtl: 7200,
 					}),
 				);
 			}

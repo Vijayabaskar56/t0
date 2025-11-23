@@ -41,7 +41,7 @@ function RouteComponent() {
 								to="/$collectionName"
 								params={{ collectionName: collection.slug }}
 								className="block w-full py-1 text-xs text-gray-800 hover:bg-accent2 hover:underline"
-								preload={i < 25 ? "viewport" : "intent"}
+								preload={"intent"}
 							>
 								{collection.name}
 							</Link>

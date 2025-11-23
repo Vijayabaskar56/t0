@@ -15,7 +15,7 @@ export const Route = createFileRoute(
 )({
 	component: RouteComponent,
 	loader: async ({ params, context }) => {
-		const [productData, relatedProductsData] = await Promise.all([
+		const [productData] = await Promise.all([
 			context.queryClient.ensureQueryData(
 				getProductDetailsOptions(params.product),
 			),
@@ -24,12 +24,7 @@ export const Route = createFileRoute(
 			),
 		]);
 
-		// Fire-and-forget image prefetching
-		prefetchProductImages(
-			productData,
-			relatedProductsData,
-			context.seenManager,
-		);
+		prefetchProductImages(productData, context.seenManager);
 	},
 	head: () => {
 		return {
@@ -105,7 +100,7 @@ function RouteComponent() {
 							subcategory_slug={subcategory ?? ""}
 							product={product}
 							imageUrl={product.imageUrl}
-							preload={i < 15 ? "intent" : "viewport"}
+							preload={"intent"}
 						/>
 					))}
 				</div>

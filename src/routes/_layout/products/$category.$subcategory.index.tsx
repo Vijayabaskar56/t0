@@ -76,7 +76,7 @@ function RouteComponent() {
 			<div className="flex flex-row flex-wrap gap-2">
 				{products.map((product, i) => (
 					<ProductLink
-						preload={i < 15 ? "viewport" : "intent"}
+						preload={"intent"}
 						key={product.name}
 						loading={imageCount++ < 15 ? "eager" : "lazy"}
 						category_slug={category}

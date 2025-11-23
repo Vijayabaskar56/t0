@@ -62,13 +62,7 @@ export const prefetchCategoryImages = createIsomorphicFn().client(
 );
 
 export const prefetchProductImages = createIsomorphicFn().client(
-	async (
-		currentProduct: any,
-		relatedProducts: any[],
-		seenManager: SeenSetManager,
-	) => {
-		const eagerCount = getEagerImageCount();
-		let count = 0;
+	async (currentProduct: any, seenManager: SeenSetManager) => {
 		const images: PrefetchImage[] = [
 			currentProduct?.imageUrl
 				? {
@@ -76,18 +70,9 @@ export const prefetchProductImages = createIsomorphicFn().client(
 						alt: currentProduct.name,
 						loading: "eager",
 						width: 256,
-						quality: 65,
+						quality: 60,
 					}
 				: null,
-			...relatedProducts
-				.filter((p) => p.imageUrl && p.slug !== currentProduct?.slug)
-				.map((product) => ({
-					src: getOptimizedUrl(product.imageUrl ?? "/placeholder.webp", 48, 60),
-					alt: product.name,
-					loading: count++ < eagerCount ? "eager" : "lazy",
-					width: 48,
-					quality: 60,
-				})),
 		].filter(Boolean) as PrefetchImage[];
 
 		prefetchImages(images, seenManager);
