@@ -23,9 +23,7 @@ export function Image({
 	blurDataURL,
 	...props
 }: ImageProps) {
-	const optimizedUrl = getOptimizedUrl(src, width, quality);
-	// const srcSet = getOptimizedSrcSet(src, width, quality);
-
+	const optimizedUrl = getOptimizedUrl(src, width, height, quality);
 	return (
 		<img
 			src={optimizedUrl}

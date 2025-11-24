@@ -24,7 +24,7 @@ export const prefetchCollectionsImages = createIsomorphicFn().client(
 			collection.categories
 				.filter((cat) => cat.imageUrl)
 				.map((cat) => ({
-					src: getOptimizedUrl(cat.imageUrl ?? "/placeholder.webp", 48, 65),
+					src: getOptimizedUrl(cat.imageUrl ?? "/placeholder.webp", 48, 48, 65),
 					alt: cat.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
 					width: 48,
@@ -48,6 +48,7 @@ export const prefetchCategoryImages = createIsomorphicFn().client(
 						src: getOptimizedUrl(
 							subcat.imageUrl ?? "/placeholder.webp",
 							48,
+							48,
 							65,
 						),
 						alt: subcat.name,
@@ -66,7 +67,7 @@ export const prefetchProductImages = createIsomorphicFn().client(
 		const images: PrefetchImage[] = [
 			currentProduct?.imageUrl
 				? {
-						src: getOptimizedUrl(currentProduct.imageUrl, 256, 65),
+						src: getOptimizedUrl(currentProduct.imageUrl, 256, 256, 65),
 						alt: currentProduct.name,
 						loading: "eager",
 						width: 256,
@@ -87,7 +88,7 @@ export const prefetchCollectionImages = createIsomorphicFn().client(
 			collectionDetails?.[0]?.categories
 				?.filter((cat: any) => cat.imageUrl)
 				.map((cat: any) => ({
-					src: getOptimizedUrl(cat.imageUrl ?? "/placeholder.webp", 48, 65),
+					src: getOptimizedUrl(cat.imageUrl ?? "/placeholder.webp", 48, 48, 65),
 					alt: cat.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
 					width: 48,
@@ -106,7 +107,12 @@ export const prefetchSubcategoryImages = createIsomorphicFn().client(
 			productsData
 				?.filter((product: any) => product.imageUrl)
 				.map((product: any) => ({
-					src: getOptimizedUrl(product.imageUrl ?? "/placeholder.webp", 48, 60),
+					src: getOptimizedUrl(
+						product.imageUrl ?? "/placeholder.webp",
+						48,
+						48,
+						60,
+					),
 					alt: product.name,
 					loading: count++ < eagerCount ? "eager" : "lazy",
 					width: 48,
