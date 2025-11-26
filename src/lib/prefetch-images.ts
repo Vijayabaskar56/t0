@@ -3,13 +3,13 @@ import type { Category, Collection } from "@/db/schema";
 import { getEagerImageCount } from "./get-eager-image-count";
 import { getOptimizedUrl } from "./image-optimization";
 import type { SeenSetManager } from "./seen-set-manager";
-
 export type PrefetchImage = {
 	src: string;
 	srcset?: string | null;
 	sizes?: string | null;
 	loading?: string;
 	width?: number;
+	height?: number;
 	quality?: number;
 };
 
@@ -67,7 +67,7 @@ export const prefetchProductImages = createIsomorphicFn().client(
 		const images: PrefetchImage[] = [
 			currentProduct?.imageUrl
 				? {
-						src: getOptimizedUrl(currentProduct.imageUrl, 256, 256, 65),
+						src: getOptimizedUrl(currentProduct.imageUrl, 256, 256, 60),
 						alt: currentProduct.name,
 						loading: "eager",
 						width: 256,
@@ -131,7 +131,6 @@ export function prefetchImages(
 
 	for (const image of images) {
 		if (image.loading === "lazy" || seenManager.isSeen(image.src)) continue;
-
 		const img = new Image();
 		img.decoding = "async";
 		img.fetchPriority = "low";

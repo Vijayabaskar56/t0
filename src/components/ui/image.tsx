@@ -1,5 +1,5 @@
+import { Image as UnImage } from "@unpic/react";
 import type { ImgHTMLAttributes } from "react";
-import { getOptimizedUrl } from "@/lib/image-optimization";
 
 interface ImageProps
 	extends Omit<ImgHTMLAttributes<HTMLImageElement>, "srcSet"> {
@@ -23,10 +23,9 @@ export function Image({
 	blurDataURL,
 	...props
 }: ImageProps) {
-	const optimizedUrl = getOptimizedUrl(src, width, height, quality);
 	return (
-		<img
-			src={optimizedUrl}
+		<UnImage
+			src={src}
 			alt={alt}
 			width={width}
 			height={height}
@@ -42,6 +41,24 @@ export function Image({
 						}
 					: props.style
 			}
+			cdn="cloudflare"
+			options={{
+				cloudflare: {
+					domain: "tanstack-faster.tancn.dev",
+				},
+			}}
+			operations={{
+				cloudflare: {
+					width: width,
+					height: height,
+					quality: quality,
+					f: "auto",
+					format: "auto",
+				},
+			}}
+			onLoad={(e) => {
+				console.log("Image src:", e.currentTarget.src); // Log the actual URL, should now include transforms
+			}}
 			{...props}
 		/>
 	);
