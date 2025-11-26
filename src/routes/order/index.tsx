@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { Suspense, useMemo } from "react";
 import z from "zod";
 import PlaceOrderAuth from "@/components/auth-component";
+import { LoginForm } from "@/components/login-form";
 import { Image } from "@/components/ui/image";
 import { db } from "@/db";
 import type { Product } from "@/db/schema";
@@ -310,7 +311,7 @@ function RouteComponent() {
 					</p>
 				</div>
 				<Suspense>
-					<PlaceOrderAuth />
+					<LoginForm />
 				</Suspense>
 			</div>
 		</div>

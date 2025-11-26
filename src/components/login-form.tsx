@@ -88,6 +88,7 @@ export function LoginForm() {
 
 				<Button
 					type="button"
+					variant={"ghost"}
 					className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
 					disabled={isLoading}
 					onClick={(e) => {
@@ -103,7 +104,7 @@ export function LoginForm() {
 
 				<Button
 					type="button"
-					variant={"link"}
+					variant={"ghost"}
 					className="rounded-[2px] border border-accent1 bg-white px-4 py-2 text-xs font-semibold text-accent1"
 					disabled={isLoading}
 					onClick={(e) => {

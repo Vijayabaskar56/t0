@@ -22,8 +22,6 @@ const SearchDropdownComponent = lazy(
 	() => import("@/components/search-dropdown"),
 );
 
-const AuthComponent = lazy(() => import("@/components/auth-component"));
-
 interface MyRouterContext {
 	queryClient: QueryClient;
 	seenManager: SeenSetManager;
@@ -83,12 +81,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 									preload="intent"
 								>
 									<span className="flex flex-row gap-2 pb-4">
-										<Image
+										<img
 											src="/logo-black.svg"
 											alt="logo"
 											height={40}
 											width={40}
-											quality={65}
 										/>
 										TanStack Start Faster
 									</span>
