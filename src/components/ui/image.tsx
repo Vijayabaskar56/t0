@@ -44,7 +44,7 @@ export function Image({
 			cdn="cloudflare"
 			options={{
 				cloudflare: {
-					domain: "tanstack-faster.tancn.dev",
+					domain: "images.tancn.dev",
 				},
 			}}
 			operations={{
@@ -55,9 +55,6 @@ export function Image({
 					f: "auto",
 					format: "auto",
 				},
-			}}
-			onLoad={(e) => {
-				console.log("Image src:", e.currentTarget.src); // Log the actual URL, should now include transforms
 			}}
 			{...props}
 		/>
