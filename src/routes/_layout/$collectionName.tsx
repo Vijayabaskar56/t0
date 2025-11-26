@@ -63,7 +63,7 @@ function RouteComponent() {
 							}}
 						>
 							<Image
-								loading={imageCount++ < 15 ? "eager" : "lazy"}
+								loading={imageCount++ < 30 ? "eager" : "lazy"}
 								decoding="sync"
 								src={category.imageUrl ?? "/placeholder.webp"}
 								alt={`${category.name}`}
