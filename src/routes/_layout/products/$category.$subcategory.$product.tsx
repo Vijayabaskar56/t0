@@ -5,7 +5,6 @@ import {
 	getProductsForSubcategoryOptions,
 } from "@/api/query-options";
 import { AddToCartForm } from "@/components/add-to-cart-form";
-import { Image } from "@/components/ui/image";
 import { ProductLink } from "@/components/ui/product-card";
 import type { Product } from "@/db/schema";
 import { prefetchProductImages } from "@/lib/prefetch-images";
@@ -68,7 +67,7 @@ function RouteComponent() {
 			</h1>
 			<div className="flex flex-col gap-2">
 				<div className="flex flex-row gap-2">
-					<Image
+					<img
 						loading="eager"
 						decoding="sync"
 						src={currentProduct?.imageUrl ?? "/placeholder.webp"}
@@ -76,7 +75,6 @@ function RouteComponent() {
 						height={256}
 						width={256}
 						className="h-56 w-56 shrink-0 border-2 md:h-64 md:w-64"
-						quality={65}
 					/>
 					<p className="grow text-base">{currentProduct?.description}</p>
 				</div>
