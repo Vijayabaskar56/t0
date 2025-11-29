@@ -50,7 +50,6 @@ tmp
 temp
 migration-images
 .wrangler
-data
 .claude
 .cursor
 .tanstack
