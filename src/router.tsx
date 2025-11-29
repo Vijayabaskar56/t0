@@ -18,8 +18,8 @@ export const getRouter = () => {
 		scrollRestoration: true,
 		defaultStructuralSharing: true,
 		scrollRestorationBehavior: "smooth",
-		defaultPreloadDelay: 0,
-		defaultPreloadIntentProximity: 150,
+		defaultPreloadDelay: 100,
+		defaultPreloadIntentProximity: 1000,
 		defaultNotFoundComponent: () => <div>Not Found</div>,
 		defaultErrorComponent: ({ error, reset }) => (
 			<ErrorBoundary error={error} reset={reset} />

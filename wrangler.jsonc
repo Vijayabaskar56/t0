@@ -3,7 +3,10 @@
 	"name": "tanstack-fast",
 	"compatibility_date": "2025-09-24",
 	"compatibility_flags": [
-		"nodejs_compat"
+		"nodejs_compat",
+		"enable_request_signal",
+    "request_signal_passthrough",
+		"no_handle_cross_request_promise_resolution"
 	],
 	"placement": {
     "mode": "smart"
