@@ -11,6 +11,10 @@
 	"placement": {
     "mode": "smart"
   },
+	"assets": {
+		"directory": "./public",
+		"binding": "ASSETS"
+	},
 	"main" : "./src/server.ts",
 	"d1_databases": [
 		{
