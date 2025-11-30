@@ -44,7 +44,7 @@ export function Image({
 			cdn="cloudflare"
 			options={{
 				cloudflare: {
-					domain: "images.tancn.dev",
+					domain: "tanstack-faster.tancn.dev",
 				},
 			}}
 			operations={{
