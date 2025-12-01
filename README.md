@@ -2,6 +2,8 @@
 
 A highly performant e-commerce template using TanStack and Cloudflare, inspired by [NextFaster](https://github.com/ethanniser/next-faster) by [@ethanniser](https://x.com/ethanniser), [@RhysSullivan](https://x.com/RhysSullivan) and [@armans-code](https://x.com/ksw_arman). This version showcases the power of TanStack Router, Query, and Start deployed on Cloudflare's edge platform.
 
+| Blog Post on Sharing my experience building it :- [Sharing my Learning and Experience Building Tanstack Faster](https://baskar.dev/posts/tanstack-faster/)
+
 ### Design notes
 
 **Inspired by the original [NextFaster twitter thread](https://x.com/ethanniser/status/1848442738204643330)**
