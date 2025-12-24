@@ -42,11 +42,11 @@ export function Image({
 					: props.style
 			}
 			cdn="cloudflare"
-			options={{
-				cloudflare: {
-					domain: "tanstack-faster.tancn.dev",
-				},
-			}}
+			// options={{
+			// 	cloudflare: {
+			// 		domain: "tanstack-faster.tancn.dev",
+			// 	},
+			// }}
 			operations={{
 				cloudflare: {
 					width: width,
