@@ -41,7 +41,7 @@ export function Image({
 						}
 					: props.style
 			}
-			cdn="cloudflare"
+			// cdn="cloudflare"
 			// options={{
 			// 	cloudflare: {
 			// 		domain: "tanstack-faster.tancn.dev",
